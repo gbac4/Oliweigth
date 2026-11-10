@@ -97,7 +97,7 @@ main{max-width:760px;margin:0 auto;padding:16px}.screen{display:none}.screen.act
 </nav><div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
 'use strict';
-const APP_VERSION='2.0.1';
+const APP_VERSION='2.0.3';
 const KEY='oliweight.v2';
 const LEGACY_KEYS=['oliweight.v1','zen.v1'];
 const REASONS=['Portion plus grosse','Plus d’huile','Plus de sucre','Ingrédient remplacé','Pas eu le temps','Très faim','Pas faim','Fatigue','Autre'];
@@ -113,6 +113,7 @@ const DEFAULT_MEALS={
  P3:{nom:'Yaourt grec, fruit, œuf',details:'¾ de tasse de yaourt grec nature + 1 fruit + 1 œuf + 1 tranche de pain complet.',ing:['O:Yaourt grec nature','L:Fruits','O:Œufs','F:Pain complet']},
  C1:{nom:'Fruit entier',details:'1 fruit entier (pas de jus).',ing:['L:Fruits']},
  C2:{nom:'Whey + fruit',details:'1 dose de whey dans de l’eau ou du lait 1 % + 1 fruit.\n21 h, seulement si faim : un verre de lait ou un yaourt nature.',ing:['E:Whey (sans caféine)','O:Lait 1 %','L:Fruits']},
+ C3:{nom:'Pouding de chia au yaourt',details:'1 c. à soupe rase de graines de chia (12 g) + ½ tasse de lait 1 % (125 ml) + ⅓ de tasse de yaourt grec nature 0 % ou 2 % (80 g) + 1 c. à thé de miel (7 g).\nMélanger le chia et le lait, laisser gonfler au frigo au moins 2 h (idéalement la veille), puis ajouter le yaourt et le miel.\nEnviron 200 kcal, 14 g de protéines et 5 g de fibres. Boire un verre d’eau avec.',ing:['E:Graines de chia','O:Yaourt grec nature','O:Lait 1 %','E:Miel']},
  D1:{nom:'Poulet grillé, gombo sauté',details:'Poulet grillé (taille de la paume) + gombo sauté + 2 petites pommes de terre bouillies.',ing:['P:Poulet','L:Gombo','F:Pommes de terre']},
  D2:{nom:'Haricots aux légumes',details:'Haricots aux légumes + salade de crudités. Les haricots comptent comme féculent.',ing:['F:Haricots','L:Tomates','L:Oignons','L:Carottes']},
  D3:{nom:'Bol méditerranéen',details:'Poulet + ½ tasse de pois chiches + crudités + 1 c. à soupe d’huile d’olive.',ing:['P:Poulet','F:Pois chiches','L:Concombre','L:Tomates','E:Huile d’olive']},
@@ -126,7 +127,7 @@ const DEFAULT_MEALS={
  'S-D':{nom:'Poisson grillé, épinards, taro',details:'Grillade rapide du dimanche : poisson grillé + épinards sautés + 1 taro.',ing:['P:Poisson','L:Épinards','F:Taro']}
 };
 // jour 1 = lundi … 7 = dimanche → [petit-déj., collation 11 h, dîner, collation 15 h 30, souper]
-const DEFAULT_PLAN={'1':['P1','C1','D1','C2','S-A'],'2':['P2','C1','D2','C2','S-A'],'3':['P3','C1','D3','C2','S-B'],'4':['P1','C1','D4','C2','S-B'],'5':['P2','C1','D5','C2','S-C'],'6':['P3','C1','D6','C2','S-C'],'7':['P2','C1','D7','C2','S-D']};
+const DEFAULT_PLAN={'1':['P1','C1','D1','C2','S-A'],'2':['P2','C1','D2','C3','S-A'],'3':['P3','C1','D3','C2','S-B'],'4':['P1','C1','D4','C3','S-B'],'5':['P2','C1','D5','C2','S-C'],'6':['P3','C1','D6','C3','S-C'],'7':['P2','C1','D7','C2','S-D']};
 const DAYS=['','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
 
 const $=id=>document.getElementById(id);
@@ -195,6 +196,8 @@ function migrateLegacy(x,from){
  return d;
 }
 function normalize(x){const f=fresh();return {...f,...x,version:2,settings:{...f.settings,...(x.settings||{})},meals:{...clone(DEFAULT_MEALS),...(x.meals||{})},plan:{...clone(DEFAULT_PLAN),...(x.plan||{})},logs:x.logs||{},weights:Array.isArray(x.weights)?x.weights:[],shop:x.shop||{},meta:{...f.meta,...(x.meta||{})}}}
+const PATCHES=[{id:'chia-c3',run:d=>{['2','4','6'].forEach(k=>{if(d.plan[k]&&d.plan[k][3]==='C2')d.plan[k][3]='C3'});if(!d.meals.C3)d.meals.C3=clone(DEFAULT_MEALS.C3)}}];
+function applyPatches(d){d.meta.patches=d.meta.patches||[];let changed=false;PATCHES.forEach(p=>{if(!d.meta.patches.includes(p.id)){p.run(d);d.meta.patches.push(p.id);changed=true}});return changed}
 function load(){
  try{
   const raw=localStorage.getItem(KEY);
@@ -202,9 +205,10 @@ function load(){
   for(const k of LEGACY_KEYS){const r=localStorage.getItem(k);if(r){const m=migrateLegacy(JSON.parse(r),k);localStorage.setItem(KEY,JSON.stringify(m));return m}}
   // l’ancienne clé n’est jamais effacée : elle reste comme filet de sécurité
  }catch(e){console.warn('Lecture du stockage impossible',e)}
- return fresh();
+ const f=fresh();f.meta.patches=PATCHES.map(p=>p.id);return f; // nouveau téléphone : menus déjà à jour
 }
 let data=load(),selectedDate=todayISO(),memoryOnly=false;
+if(applyPatches(data))save();
 function save(){try{localStorage.setItem(KEY,JSON.stringify(data));memoryOnly=false;return true}catch(e){memoryOnly=true;toast('Stockage indisponible. Sauvegarde tes données.');return false}}
 if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
 function logFor(s){if(!data.logs[s])data.logs[s]={meals:{},water:0,steps:'',sleep:'',feedsDay:0,feedsNight:0,energy:0,hunger:0,note:''};const l=data.logs[s];l.meals=l.meals||{};return l}
@@ -381,7 +385,8 @@ $('importMenu').addEventListener('click',async()=>{const f=$('menuImport').files
 $('clearData').addEventListener('click',()=>{if(confirm('Effacer définitivement toutes les données OliWeight de ce téléphone ?')&&confirm('Vraiment ? Pense à sauvegarder avant.')){data=fresh();data.meta.migratedFrom='effacé';data.meta.migrationShown=true;save();selectedDate=todayISO();renderAll();toast('Données effacées.')}});
 $('weightDate').value=todayISO();
 window.addEventListener('resize',()=>{if($('progress').classList.contains('active'))drawChart()});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden){if(selectedDate>todayISO())selectedDate=todayISO();renderToday()}});
+let lastToday=todayISO();function checkDay(){const t=todayISO();if(t!==lastToday){if(selectedDate===lastToday)selectedDate=t;lastToday=t;$('weightDate').value=t;renderAll()}else if(selectedDate>t){selectedDate=t;renderToday()}}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkDay()});window.addEventListener('focus',checkDay);setInterval(checkDay,60000);
 if('serviceWorker' in navigator&&location.protocol!=='file:'){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').then(r=>r.update()).catch(e=>console.warn('SW non enregistré',e))});let reloaded=false;const hadController=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloaded||!hadController)return;reloaded=true;toast('OliWeight a été mis à jour.')})}
 if(data.meta.migratedFrom&&!data.meta.migrationShown){data.meta.migrationShown=true;save();setTimeout(()=>toast('Nouvelle version : tes données ont été reprises.'),600)}
 renderAll();
