@@ -60,14 +60,14 @@ const PROFILE_FIELDS = [
     ],
   },
   {k: 'foyer', label: 'Personnes à la maison', type: 'number', min: 1, max: 15},
-  {k: 'deuxJours', label: 'Je cuisine une fois pour 2 jours', type: 'yesno'},
+  {k: 'deuxJours', label: 'Je cuisine une fois pour 2 jours', type: 'yesno', def: true},
 ];
 function profileFormHTML(prefix) {
   const p = data.profile || {},
     s = data.settings;
   return PROFILE_FIELDS.map((f) => {
     const id = prefix + f.k,
-      v = f.set ? (s[f.k] ?? '') : (p[f.k] ?? ''),
+      v = f.set ? (s[f.k] ?? '') : (p[f.k] ?? f.def ?? ''),
       req = f.req ? ' <span class="muted">*</span>' : '';
     if (f.type === 'select')
       return `<div class="field"><label for="${id}">${esc(f.label)}</label><select id="${id}" data-pf="${f.k}"><option value="">—</option>${f.opts.map(([o, l]) => `<option value="${o}" ${v === o ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select></div>`;
@@ -165,6 +165,7 @@ function showOnboarding() {
     }
     applyProfile(res);
     data.settings.startDate = todayISO();
+    proposeMenusFromBank();
     save();
     const warn = profileWarnings(data.profile);
     document.body.classList.remove('onboarding');

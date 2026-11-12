@@ -160,7 +160,10 @@ function setMenuTab(t) {
   document.querySelectorAll('[data-menutab]').forEach((x) => x.classList.toggle('active', x.dataset.menutab === t));
   $('menuWeek').classList.toggle('hidden', t !== 'week');
   $('menuShop').classList.toggle('hidden', t !== 'shop');
-  renderMenus();
+  $('menuRecipes').classList.toggle('hidden', t !== 'recipes');
+  $('weekChips').classList.toggle('hidden', t === 'recipes');
+  if (t === 'recipes') renderRecipes();
+  else renderMenus();
 }
 function renderChips() {
   const opts = [['cur', 'Cette semaine']].concat(

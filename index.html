@@ -39,7 +39,7 @@
 
 <section class="screen" id="menus">
  <div class="heading"><div><h1>Menus</h1><div class="muted small" id="menuLabel"></div></div></div>
- <div class="seg"><button class="active" data-menutab="week">🗓️ Menus</button><button data-menutab="shop">🛒 Courses</button></div>
+ <div class="seg"><button class="active" data-menutab="week">🗓️ Menus</button><button data-menutab="shop">🛒 Courses</button><button data-menutab="recipes">📚 Recettes</button></div>
  <div class="chips" id="weekChips"></div>
  <div id="menuWeek">
   <div class="card"><p class="small muted" style="margin:0" id="weekInfo"></p></div>
@@ -49,6 +49,7 @@
    <div class="row"><div class="field grow"><label for="swapA">Entre</label><select id="swapA"></select></div><div class="field grow"><label for="swapB">et</label><select id="swapB"></select></div></div>
    <div class="row wrap"><button class="primary grow" id="swapDo">Échanger</button><button id="swapUndo">Annuler les échanges</button></div></div>
  </div>
+ <div id="menuRecipes" class="hidden"><div class="card"><div class="row between"><h2 style="margin:0">Banque de recettes</h2><span class="pill" id="recipeCount"></span></div><p class="small muted">Toutes les recettes d’OliWeight. Les étiquettes sont indicatives : en cas d’allergie ou de maladie, vérifie toujours les ingrédients.</p><div id="recipeFilters"></div></div><div class="day-list" id="recipeList"></div></div>
  <div id="menuShop" class="hidden">
   <div class="card"><div class="row between"><h2 style="margin:0">Liste de courses</h2><span class="pill" id="shopCount"></span></div><p class="small muted" id="shopInfo">Tirée des menus de la semaine choisie. Coche au fur et à mesure.</p>
    <div class="row wrap"><button class="primary grow" id="shopShare">Envoyer la liste</button><button id="shopReset">Tout décocher</button></div>
@@ -115,6 +116,7 @@
 <script src="./js/weights.js"></script>
 <script src="./js/photos.js"></script>
 <script src="./js/menus.js"></script>
+<script src="./js/recipes.js"></script>
 <script src="./js/today.js"></script>
 <script src="./js/progress.js"></script>
 <script src="./js/settings.js"></script>
