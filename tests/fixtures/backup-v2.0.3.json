@@ -1,0 +1,347 @@
+{
+ "version": 2,
+ "settings": {
+  "startWeight": 100.0,
+  "startDate": "2026-11-09",
+  "targetLoss": 0.5,
+  "waterGoal": 2500,
+  "stepsGoal": 5000,
+  "weighDay": 1,
+  "reminderTime": "20:00",
+  "menuLabel": "Menus semaine 1"
+ },
+ "meals": {
+  "P1": {
+   "nom": "Salade + sardines",
+   "details": "Laitue, chou rouge, tomate, concombre, carotte, oignon + 1 boîte de sardines égouttées + 1 œuf + 1 tranche de pain complet. Vinaigrette : 1 c. à soupe d'huile + vinaigre.",
+   "ing": [
+    "L:Laitue",
+    "L:Chou rouge",
+    "L:Tomates",
+    "L:Concombre",
+    "L:Carottes",
+    "L:Oignons",
+    "L:Ail",
+    "E:Vinaigre",
+    "E:Huile végétale",
+    "P:Sardines en boîte",
+    "O:Œufs",
+    "F:Pain complet"
+   ]
+  },
+  "P2": {
+   "nom": "Salade + œufs, avocat, fromage",
+   "details": "Salade de base + 2 œufs + ¼ d'avocat + 30 g de fromage + 1 tranche de pain complet. Dimanche : pommes de terre au four au lieu du pain.",
+   "ing": [
+    "L:Laitue",
+    "L:Chou rouge",
+    "L:Tomates",
+    "L:Concombre",
+    "L:Carottes",
+    "L:Oignons",
+    "L:Ail",
+    "E:Vinaigre",
+    "E:Huile végétale",
+    "O:Œufs",
+    "L:Avocats",
+    "O:Fromage",
+    "F:Pain complet"
+   ]
+  },
+  "P3": {
+   "nom": "Yaourt grec, fruit, œuf",
+   "details": "¾ de tasse de yaourt grec nature + 1 fruit + 1 œuf + 1 tranche de pain complet.",
+   "ing": [
+    "O:Yaourt grec nature",
+    "L:Fruits",
+    "O:Œufs",
+    "F:Pain complet"
+   ]
+  },
+  "C1": {
+   "nom": "Fruit entier",
+   "details": "1 fruit entier (pas de jus).",
+   "ing": [
+    "L:Fruits"
+   ]
+  },
+  "C2": {
+   "nom": "Whey + fruit",
+   "details": "1 dose de whey dans de l'eau ou du lait 1 % + 1 fruit.",
+   "ing": [
+    "E:Whey (sans caféine)",
+    "O:Lait 1 %",
+    "L:Fruits"
+   ]
+  },
+  "C3": {
+   "nom": "Pouding de chia au yaourt",
+   "details": "1 c. à soupe rase de graines de chia (12 g) + ½ tasse de lait 1 % (125 ml) + ⅓ de tasse de yaourt grec nature 0 % ou 2 % (80 g) + 1 c. à thé de miel (7 g).\nMélanger le chia et le lait, laisser gonfler au frigo au moins 2 h (idéalement la veille), puis ajouter le yaourt et le miel.\nEnviron 200 kcal, 14 g de protéines et 5 g de fibres. Boire un verre d’eau avec.",
+   "ing": [
+    "E:Graines de chia",
+    "O:Yaourt grec nature",
+    "O:Lait 1 %",
+    "E:Miel"
+   ]
+  },
+  "D1": {
+   "nom": "Poulet grillé, gombo sauté",
+   "details": "Poulet grillé (paume) + gombo sauté + 2 petites pommes de terre bouillies.",
+   "ing": [
+    "P:Poulet",
+    "L:Gombo",
+    "F:Pommes de terre"
+   ]
+  },
+  "D2": {
+   "nom": "Haricots aux légumes",
+   "details": "Haricots aux légumes + salade de crudités. Les haricots comptent comme féculent.",
+   "ing": [
+    "F:Haricots",
+    "L:Tomates",
+    "L:Oignons",
+    "L:Carottes"
+   ]
+  },
+  "D3": {
+   "nom": "Bol méditerranéen",
+   "details": "Poulet + ½ tasse de pois chiches + crudités + 1 c. à soupe d'huile d'olive.",
+   "ing": [
+    "P:Poulet",
+    "F:Pois chiches",
+    "L:Concombre",
+    "L:Tomates",
+    "E:Huile d’olive"
+   ]
+  },
+  "D4": {
+   "nom": "Maquereau ou sardines grillés",
+   "details": "Poisson grillé + épinards sautés + 1 taro.",
+   "ing": [
+    "P:Maquereau ou sardines fraîches",
+    "L:Épinards",
+    "F:Taro"
+   ]
+  },
+  "D5": {
+   "nom": "Sauté asiatique poulet-légumes",
+   "details": "Poulet et légumes sautés + ¾ de tasse de spaghetti ou de nouilles.",
+   "ing": [
+    "P:Poulet",
+    "L:Poivrons",
+    "L:Brocoli",
+    "F:Spaghetti ou nouilles"
+   ]
+  },
+  "D6": {
+   "nom": "Curry de lentilles",
+   "details": "Curry de lentilles aux légumes + ½ tasse de riz.",
+   "ing": [
+    "F:Lentilles",
+    "F:Riz",
+    "L:Oignons",
+    "L:Tomates",
+    "E:Curry en poudre"
+   ]
+  },
+  "D7": {
+   "nom": "Okok allégé au bœuf maigre",
+   "details": "Okok (moitié moins d'huile et d'arachide) + ½ bâton de manioc.",
+   "ing": [
+    "L:Feuilles d’okok",
+    "P:Bœuf maigre",
+    "E:Pâte d’arachide",
+    "F:Bâton de manioc"
+   ]
+  },
+  "S-A": {
+   "nom": "Poisson braisé sauce tomate + plantain",
+   "details": "Tilapia ou maquereau, sauce tomate-oignons-poivrons-épinards, 1 c. à soupe d'huile par personne + ½ plantain bouilli.",
+   "ing": [
+    "P:Tilapia ou maquereau",
+    "L:Tomates",
+    "L:Oignons",
+    "L:Poivrons",
+    "L:Épinards",
+    "F:Plantains"
+   ]
+  },
+  "S-B": {
+   "nom": "Poulet aux légumes + riz",
+   "details": "Poulet sans peau, beaucoup de légumes, 1 c. à soupe d'huile par personne + ¾ de tasse de riz cuit.",
+   "ing": [
+    "P:Poulet",
+    "L:Carottes",
+    "L:Poivrons",
+    "L:Haricots verts",
+    "F:Riz"
+   ]
+  },
+  "S-C": {
+   "nom": "Sauce gombo au bœuf maigre + couscous de maïs",
+   "details": "Gombo et épinards, 1 c. à soupe d'huile de palme par personne, bœuf maigre + crevettes séchées + 1 petite boule de couscous.",
+   "ing": [
+    "L:Gombo",
+    "L:Épinards",
+    "P:Bœuf maigre",
+    "P:Crevettes séchées",
+    "E:Huile de palme",
+    "F:Farine de maïs"
+   ]
+  },
+  "S-D": {
+   "nom": "Poisson grillé, épinards, taro",
+   "details": "Grillade rapide du dimanche : poisson grillé + épinards sautés + 1 taro.",
+   "ing": [
+    "P:Poisson",
+    "L:Épinards",
+    "F:Taro"
+   ]
+  }
+ },
+ "plan": {
+  "1": [
+   "P1",
+   "C1",
+   "D1",
+   "C2",
+   "S-A"
+  ],
+  "2": [
+   "P2",
+   "C1",
+   "D2",
+   "C3",
+   "S-A"
+  ],
+  "3": [
+   "P3",
+   "C1",
+   "D3",
+   "C2",
+   "S-B"
+  ],
+  "4": [
+   "P1",
+   "C1",
+   "D4",
+   "C3",
+   "S-B"
+  ],
+  "5": [
+   "P2",
+   "C1",
+   "D5",
+   "C2",
+   "S-C"
+  ],
+  "6": [
+   "P3",
+   "C1",
+   "D6",
+   "C3",
+   "S-C"
+  ],
+  "7": [
+   "P2",
+   "C1",
+   "D7",
+   "C2",
+   "S-D"
+  ]
+ },
+ "logs": {
+  "2026-11-09": {
+   "meals": {
+    "0": {
+     "status": "partial",
+     "reasons": [
+      "Ingrédient remplacé"
+     ],
+     "replacement": ""
+    },
+    "1": {
+     "status": "replaced",
+     "reasons": [],
+     "replacement": "Thé vert test"
+    },
+    "2": {
+     "status": "replaced",
+     "reasons": [],
+     "replacement": "Repas de remplacement test"
+    },
+    "3": {
+     "status": "done",
+     "reasons": [],
+     "replacement": ""
+    },
+    "4": {
+     "status": "partial",
+     "reasons": [
+      "Ingrédient remplacé"
+     ],
+     "replacement": ""
+    }
+   },
+   "water": 2000,
+   "steps": "5000",
+   "sleep": "6",
+   "feedsDay": 3,
+   "feedsNight": 1,
+   "energy": 3,
+   "hunger": 4,
+   "note": "note de test"
+  },
+  "2026-11-10": {
+   "meals": {
+    "0": {
+     "status": "done",
+     "reasons": [],
+     "replacement": ""
+    },
+    "1": {
+     "status": "done",
+     "reasons": [],
+     "replacement": ""
+    },
+    "2": {
+     "status": "done",
+     "reasons": [],
+     "replacement": ""
+    },
+    "3": {
+     "status": "done",
+     "reasons": [],
+     "replacement": ""
+    }
+   },
+   "water": 2500,
+   "steps": "",
+   "sleep": "",
+   "feedsDay": 3,
+   "feedsNight": 1,
+   "energy": 3,
+   "hunger": 3,
+   "note": "note de test"
+  }
+ },
+ "weights": [
+  {
+   "date": "2026-11-10",
+   "kg": 99.4,
+   "waist": ""
+  }
+ ],
+ "shop": {
+  "week": "2026-11-09",
+  "checked": {}
+ },
+ "meta": {
+  "lastBackup": "2026-11-11T01:29:45.308Z",
+  "migratedFrom": "oliweight.v1",
+  "patches": [
+   "chia-c3"
+  ],
+  "migrationShown": true
+ }
+}
