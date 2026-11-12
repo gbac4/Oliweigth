@@ -1,6 +1,6 @@
 // OliWeight — service worker
 // Change VERSION à chaque mise en ligne : les téléphones récupèrent alors la nouvelle version.
-const VERSION = 'oliweight-v2.6.0';
+const VERSION = 'oliweight-v2.6.1';
 const CORE = [
   './',
   './index.html',

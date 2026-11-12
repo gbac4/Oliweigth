@@ -4,9 +4,9 @@ function fresh() {
   return {
     version: 2,
     settings: {
-      startWeight: 116,
-      startDate: '2026-11-09',
-      targetWeight: 76,
+      startWeight: '',
+      startDate: todayISO(),
+      targetWeight: '',
       targetLoss: 0.5,
       waterGoal: 2500,
       stepsGoal: 5000,
@@ -21,7 +21,7 @@ function fresh() {
     logs: {},
     weights: [],
     shop: {},
-    current: {startDate: '2026-11-09', label: 'Menus semaine 1', rev: 0, basePlan: clone(DEFAULT_PLAN), swaps: []},
+    current: {startDate: weekStartOf(todayISO()), label: 'Menus semaine 1', rev: 0, basePlan: clone(DEFAULT_PLAN), swaps: []},
     weeks: DEFAULT_CYCLE.weeks.map(cycleWeek),
     history: {},
     shopByWeek: {},
@@ -212,8 +212,9 @@ const PATCHES = [
   {
     id: 'cible-40',
     run: (d) => {
-      if (!d.meta.targetSet) {
-        d.settings.targetWeight = Math.round((num(d.settings.startWeight, 116) - 40) * 10) / 10;
+      const sw = num(d.settings.startWeight);
+      if (!d.meta.targetSet && sw >= 60) {
+        d.settings.targetWeight = Math.round((sw - 40) * 10) / 10;
         d.meta.targetSet = true;
       }
     },
