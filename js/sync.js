@@ -260,6 +260,7 @@ async function pullPhotos() {
 }
 async function syncAll(force) {
   await pullMenus(force);
+  if (typeof flushFeedback === 'function') await flushFeedback();
   if (force || !syncCfg().lastPhotoPull || Date.now() - syncCfg().lastPhotoPull > 6 * 3600e3) {
     await pullPhotos();
     const n = syncCfg();
