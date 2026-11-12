@@ -170,6 +170,14 @@ function normalize(x) {
 const QTY_CODES = ['P2', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'S-A', 'S-B', 'S-C', 'S-D'];
 const PATCHES = [
   {
+    // utilisatrice déjà en place : profil partiel à compléter (elle allaite)
+    id: 'profil-1',
+    run: (d) => {
+      if (!d.profile && (Object.keys(d.logs || {}).length || (d.weights || []).length))
+        d.profile = {allaitement: true, done: false};
+    },
+  },
+  {
     id: 'v23-options',
     run: (d) => {
       Object.entries(NEW_MEALS).forEach(([k, v]) => {

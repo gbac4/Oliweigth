@@ -164,6 +164,7 @@ function summaryText() {
         '',
       );
   }
+  L.push(...profileSummary());
   L.push('POIDS');
   if (ws.length)
     ws.slice(-4).forEach((w) => L.push(`- ${w.date} : ${fr(num(w.kg))} kg${w.waist ? ` · taille ${w.waist} cm` : ''}`));
