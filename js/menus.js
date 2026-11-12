@@ -225,8 +225,11 @@ function renderMenus() {
   renderShop();
 }
 function shoppingItems() {
-  const map = new Map();
-  Object.values(vPlan()).forEach((arr) =>
+  const map = new Map(),
+    plan = vPlan(),
+    // semaine en cours : les plats changés pour un jour comptent dans la liste
+    days = viewObj() ? Object.values(plan) : Object.keys(plan).map((d) => effCodes(shiftDate(vStart(), Number(d) - 1)));
+  days.forEach((arr) =>
     arr.forEach((code) => {
       (vMeal(code).ing || []).forEach((raw) => {
         const [c, name] = String(raw).includes(':') ? String(raw).split(/:(.*)/s) : ['E', String(raw)];

@@ -6,7 +6,7 @@ var SYNC_KEY = 'oliweight.sync',
   syncTimer = null,
   syncBusy = false,
   BLOCS = {1: [1, 2], 3: [3, 4], 5: [5, 6]};
-const APP_VERSION = '2.8.0';
+const APP_VERSION = '2.9.0';
 const KEY = 'oliweight.v2';
 const LEGACY_KEYS = ['oliweight.v1', 'zen.v1'];
 const REASONS = [
@@ -248,14 +248,6 @@ const EXTRAS = [
   ['Riz (½ tasse)', 105],
   ['Fromage (30 g)', 120],
 ];
-// options proposées pour remplacer un repas du plan
-const OPTIONS = {
-  0: ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'],
-  1: ['C1', 'C5', 'C4'],
-  2: ['DCR'],
-  3: ['C2', 'C3', 'C4', 'C5'],
-  4: ['DCR'],
-};
 // jour 1 = lundi … 7 = dimanche → [petit-déj., collation 11 h, dîner, collation 15 h 30, souper]
 const DEFAULT_PLAN = {
   1: ['P1', 'C1', 'D1', 'C2', 'S-A'],

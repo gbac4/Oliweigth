@@ -105,6 +105,7 @@ $('today').addEventListener('change', (e) => {
     const i = card.dataset.meal,
       l = logFor(selectedDate);
     l.alt = l.alt || {};
+    ensureMeal(e.target.value);
     if (e.target.value === planFor(selectedDate)[i]) delete l.alt[i];
     else l.alt[i] = e.target.value;
     if (l.meals[i]) l.meals[i].code = e.target.value;
