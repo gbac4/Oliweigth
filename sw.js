@@ -1,6 +1,6 @@
 // OliWeight — service worker
 // Change VERSION à chaque mise en ligne : les téléphones récupèrent alors la nouvelle version.
-const VERSION = 'oliweight-v2.2.0';
+const VERSION = 'oliweight-v2.4.0';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', event => {
