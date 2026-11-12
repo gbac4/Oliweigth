@@ -32,7 +32,7 @@
   <div class="field"><label for="steps">Pas</label><input id="steps" type="number" min="0" step="100" inputmode="numeric" placeholder="Ex. 4500"></div>
   <div class="field"><label for="sleep">Sommeil (heures)</label><input id="sleep" type="number" min="0" max="24" step=".25" inputmode="decimal" placeholder="Ex. 7,5"></div>
  </div>
- <div class="card"><h2>Allaitement</h2><div class="row between"><span>Tétées de jour</span><div class="counter"><button data-counter="feedsDay" data-delta="-1" aria-label="Retirer une tétée de jour">−</button><strong id="feedsDayValue">0</strong><button data-counter="feedsDay" data-delta="1" aria-label="Ajouter une tétée de jour">+</button></div></div><div class="row between" style="margin-top:12px"><span>Tétées de nuit</span><div class="counter"><button data-counter="feedsNight" data-delta="-1" aria-label="Retirer une tétée de nuit">−</button><strong id="feedsNightValue">0</strong><button data-counter="feedsNight" data-delta="1" aria-label="Ajouter une tétée de nuit">+</button></div></div></div>
+ <div class="card" id="feedsCard"><h2>Allaitement</h2><div class="row between"><span>Tétées de jour</span><div class="counter"><button data-counter="feedsDay" data-delta="-1" aria-label="Retirer une tétée de jour">−</button><strong id="feedsDayValue">0</strong><button data-counter="feedsDay" data-delta="1" aria-label="Ajouter une tétée de jour">+</button></div></div><div class="row between" style="margin-top:12px"><span>Tétées de nuit</span><div class="counter"><button data-counter="feedsNight" data-delta="-1" aria-label="Retirer une tétée de nuit">−</button><strong id="feedsNightValue">0</strong><button data-counter="feedsNight" data-delta="1" aria-label="Ajouter une tétée de nuit">+</button></div></div></div>
  <div class="card"><h2>Comment te sens-tu ?</h2><div class="field"><label>Énergie (1 = très basse, 5 = excellente)</label><div class="scale" id="energyScale"></div></div><div class="field"><label>Faim (1 = faible, 5 = très forte)</label><div class="scale" id="hungerScale"></div></div><div class="field"><label for="note">Note de la journée</label><textarea id="note" placeholder="Faim, fatigue, humeur, contexte…"></textarea></div><div class="small muted">Tout est enregistré automatiquement.</div></div>
  <p class="footer-note">OliWeight est un carnet de suivi, pas un dispositif médical. Pendant l’allaitement, la perte visée reste de 0,5 kg par semaine au maximum. Fais valider le plan par une diététiste (Santé811) ou ton médecin.</p>
 </section>
@@ -121,6 +121,7 @@
 <script src="./js/cycle.js"></script>
 <script src="./js/util.js"></script>
 <script src="./js/store.js"></script>
+<script src="./js/rules.js"></script>
 <script src="./js/kcal.js"></script>
 <script src="./js/weights.js"></script>
 <script src="./js/photos.js"></script>

@@ -2,6 +2,11 @@
 
 Format : une entrée par version publiée sur GitHub Pages. La version s'affiche dans Réglages, tout en bas.
 
+## 2.11.0 — 2026-11-12
+- Règles selon la situation (#5) : fin d'allaitement (carte Tétées et alerte masquées, plancher 1 500 kcal, perte max 1 % du poids/semaine) ; grossesse ou maladie : mode pause sans déficit.
+- Exclusions santé dans la banque et les équivalents : hypertension et reins (sel), diabète (sucres ajoutés), maladie cœliaque (gluten) ; anémie : plats riches en fer favorisés.
+- Bandeau « Profil modifié : menus à réviser », effacé à la réception de nouveaux menus.
+
 ## 2.10.0 — 2026-11-12
 - « Donner mon avis » dans Réglages : note 1-5, écran concerné, commentaire, capture facultative ; envoyé dans le repo privé (feedback/), gardé en attente si hors ligne (#6).
 

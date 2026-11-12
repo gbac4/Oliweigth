@@ -28,6 +28,7 @@ const PROFILE_FIELDS = [
   },
   {k: 'allaitement', label: 'J’allaite', type: 'yesno'},
   {k: 'grossesse', label: 'Je suis enceinte', type: 'yesno'},
+  {k: 'pause', label: 'Je suis malade / en pause du programme', type: 'yesno'},
   {k: 'sante', label: 'Santé (coche ce qui s’applique)', type: 'checks', opts: HEALTH},
   {k: 'medicaments', label: 'Médicaments réguliers (facultatif)', type: 'text', max: 120},
   {k: 'allergies', label: 'Allergies ou intolérances', type: 'text', max: 120, ph: 'Ex. arachide, lactose'},

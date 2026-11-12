@@ -275,13 +275,13 @@ $('saveSettings').addEventListener('click', () => {
   const tw = num($('targetWeight').value);
   if (tw >= 30 && tw < num(s.startWeight)) s.targetWeight = tw;
   else if ($('targetWeight').value) toast('Le poids cible doit être plus bas que le poids de départ.');
-  s.targetLoss = Math.min(0.5, Math.max(0, num($('targetLoss').value, 0.5)));
+  s.targetLoss = Math.min(maxLoss(), Math.max(0, num($('targetLoss').value, 0.5)));
   s.waterGoal = Math.max(0, num($('waterGoal').value));
   s.stepsGoal = Math.max(0, num($('stepsGoal').value));
   s.weighDay = num($('weighDay').value);
   s.reminderTime = $('reminderTime').value || '20:00';
   s.cutoffTime = $('cutoffTime').value || '21:00';
-  s.kcalMax = Math.max(KCAL_MIN, Math.round(num($('kcalMax').value, KCAL_MAX)));
+  s.kcalMax = Math.max(kcalMin(), Math.round(num($('kcalMax').value, KCAL_MAX)));
   save();
   renderAll();
   toast('Réglages enregistrés.');
@@ -434,6 +434,7 @@ $('importMenu').addEventListener('click', async () => {
       rev: num(w.rev, 0) > 0 ? num(w.rev) : (Date.now() / 1000) | 0,
     }));
     const n = mergeWeeks(data, list);
+    if (n) data.meta.menusReviewedAt = new Date().toISOString();
     applyDueWeeks();
     save();
     renderAll();

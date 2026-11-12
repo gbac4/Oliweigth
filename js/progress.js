@@ -12,7 +12,7 @@ function renderKcalBars() {
     y = (v) => p.t + (1 - v / max) * (H - p.t - p.b),
     bw = (W - p.l - p.r) / 7;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-  const band = `<rect x="${p.l}" y="${y(lim)}" width="${W - p.l - p.r}" height="${y(KCAL_MIN) - y(lim)}" fill="var(--brand2)" opacity=".7"/>`;
+  const band = `<rect x="${p.l}" y="${y(lim)}" width="${W - p.l - p.r}" height="${y(kcalMin()) - y(lim)}" fill="var(--brand2)" opacity=".7"/>`;
   const bars = vals
     .map((v, i) => {
       const x = p.l + i * bw + bw * 0.18,
@@ -20,18 +20,18 @@ function renderKcalBars() {
         col =
           v > lim
             ? 'var(--warn)'
-            : v >= KCAL_MIN
+            : v >= kcalMin()
               ? 'var(--brand)'
               : 'color-mix(in srgb,var(--brand) 45%,var(--surface2))';
       return `<rect x="${x}" y="${y(v)}" width="${w}" height="${Math.max(0, y(0) - y(v))}" rx="4" fill="${col}"><title>${fmtDate(dates[i], {weekday: 'long', day: 'numeric'})} : ${fmtK(v)} kcal</title></rect><text x="${x + w / 2}" y="${H - 8}" text-anchor="middle" font-size="11" fill="var(--muted)">${fmtDate(dates[i], {weekday: 'short'}).slice(0, 3)}</text>`;
     })
     .join('');
-  const line = `<line x1="${p.l}" x2="${W - p.r}" y1="${y(lim)}" y2="${y(lim)}" stroke="var(--warn)" stroke-width="1.5" stroke-dasharray="5 4"/><text x="${p.l - 4}" y="${y(lim) + 4}" text-anchor="end" font-size="10" fill="var(--muted)">${fmtK(lim)}</text><text x="${p.l - 4}" y="${y(KCAL_MIN) + 4}" text-anchor="end" font-size="10" fill="var(--muted)">${fmtK(KCAL_MIN)}</text>`;
+  const line = `<line x1="${p.l}" x2="${W - p.r}" y1="${y(lim)}" y2="${y(lim)}" stroke="var(--warn)" stroke-width="1.5" stroke-dasharray="5 4"/><text x="${p.l - 4}" y="${y(lim) + 4}" text-anchor="end" font-size="10" fill="var(--muted)">${fmtK(lim)}</text><text x="${p.l - 4}" y="${y(kcalMin()) + 4}" text-anchor="end" font-size="10" fill="var(--muted)">${fmtK(kcalMin())}</text>`;
   svg.innerHTML = band + bars + line;
   const logged = vals.filter((v) => v > 0),
     avg = logged.length ? logged.reduce((a, b) => a + b, 0) / logged.length : 0;
   $('kcalBarsText').textContent = logged.length
-    ? `Moyenne : ${fmtK(avg)} kcal par jour noté. Bande verte = zone visée (${fmtK(KCAL_MIN)} à ${fmtK(lim)}), pointillés = limite à ne pas dépasser. Les jours en cours ne sont pas terminés.`
+    ? `Moyenne : ${fmtK(avg)} kcal par jour noté. Bande verte = zone visée (${fmtK(kcalMin())} à ${fmtK(lim)}), pointillés = limite à ne pas dépasser. Les jours en cours ne sont pas terminés.`
     : 'Les barres apparaissent dès que des repas sont notés.';
 }
 /* ---------- Progrès ---------- */
@@ -104,7 +104,7 @@ function renderProgress() {
       );
   }
   const fl = st.dates.map((d) => data.logs[d]).filter((l) => l && num(l.feedsDay) + num(l.feedsNight) > 0);
-  if (fl.length >= 4) {
+  if (isBreastfeeding() && fl.length >= 4) {
     const mean = (a) => a.reduce((s, l) => s + num(l.feedsDay) + num(l.feedsNight), 0) / a.length;
     if (mean(fl.slice(0, 3)) - mean(fl.slice(-3)) >= 2)
       alerts.push(
@@ -160,11 +160,13 @@ function summaryText() {
     const ks = st.dates.map((d) => eatenKcal(d).k).filter((v) => v > 0);
     if (ks.length)
       L.push(
-        `CALORIES : moyenne ${fmtK(ks.reduce((a, b) => a + b, 0) / ks.length)} kcal/jour noté · limite ${fmtK(kcalLimit())} · minimum ${fmtK(KCAL_MIN)}`,
+        `CALORIES : moyenne ${fmtK(ks.reduce((a, b) => a + b, 0) / ks.length)} kcal/jour noté · limite ${fmtK(kcalLimit())} · minimum ${fmtK(kcalMin())}`,
         '',
       );
   }
   L.push(...profileSummary());
+  if (isPaused()) L.push(`MODE PAUSE : ${pauseReason()}`, '');
+  if (menusToReview()) L.push('⚠ PROFIL MODIFIÉ : menus à réviser', '');
   L.push('POIDS');
   if (ws.length)
     ws.slice(-4).forEach((w) => L.push(`- ${w.date} : ${fr(num(w.kg))} kg${w.waist ? ` · taille ${w.waist} cm` : ''}`));

@@ -22,7 +22,7 @@ function renderRing() {
     C = 2 * Math.PI * R,
     frac = Math.min(1, k / lim),
     over = k > lim,
-    minFrac = KCAL_MIN / lim;
+    minFrac = kcalMin() / lim;
   const t = todayISO(),
     now = new Date(),
     [ch, cm] = String(data.settings.cutoffTime || '21:00')
@@ -30,13 +30,16 @@ function renderRing() {
       .map(Number),
     late = d < t || (d === t && (now.getHours() > ch || (now.getHours() === ch && now.getMinutes() >= cm)));
   let state, cls;
-  if (over) {
+  if (isPaused()) {
+    state = 'Mode pause : mange normalement';
+    cls = 'var(--brand)';
+  } else if (over) {
     state = `Limite dépassée de ${fmtK(k - lim)} kcal`;
     cls = 'var(--warn)';
-  } else if (late && k < KCAL_MIN) {
-    state = `Sous ${fmtK(KCAL_MIN)} kcal : trop peu pour l’allaitement`;
+  } else if (late && k < kcalMin()) {
+    state = `Sous ${fmtK(kcalMin())} kcal : trop peu${isBreastfeeding() ? ' pour l’allaitement' : ''}`;
     cls = 'var(--danger)';
-  } else if (k >= KCAL_MIN) {
+  } else if (k >= kcalMin()) {
     state = `Dans la zone · reste ${fmtK(lim - k)} kcal`;
     cls = 'var(--brand)';
   } else {
@@ -52,7 +55,7 @@ function renderRing() {
   $('kcalRing').innerHTML =
     `<div class="ring-wrap"><svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="${R}" fill="none" stroke="var(--surface2)" stroke-width="16"/><circle cx="100" cy="100" r="${R}" fill="none" stroke="${over ? 'var(--warn)' : 'var(--brand)'}" stroke-width="16" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - frac)}" style="transition:stroke-dashoffset .6s ease"/>${minFrac < 1 ? `<line x1="${100 + (R - 12) * Math.cos(minFrac * 2 * Math.PI)}" y1="${100 + (R - 12) * Math.sin(minFrac * 2 * Math.PI)}" x2="${100 + (R + 12) * Math.cos(minFrac * 2 * Math.PI)}" y2="${100 + (R + 12) * Math.sin(minFrac * 2 * Math.PI)}" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round"/>` : ''}</svg><div class="ring-center"><strong>${fmtK(k)}</strong><span>/ ${fmtK(lim)} kcal</span><span>mangées</span></div></div>
  <div class="ring-state" style="color:${cls}">${esc(state)}</div>
- <div class="ring-legend"><span><i style="background:var(--brand)"></i>Mangées</span><span><i style="background:var(--text)"></i>Minimum ${fmtK(KCAL_MIN)}</span><span>Prévu aujourd’hui ≈ ${fmtK(plan)}</span></div>${unknown ? `<div class="small muted" style="margin-top:6px">${unknown} repas remplacé${unknown > 1 ? 's' : ''} sans calories : ajoute une estimation pour un total juste.</div>` : ''}`;
+ <div class="ring-legend"><span><i style="background:var(--brand)"></i>Mangées</span><span><i style="background:var(--text)"></i>Minimum ${fmtK(kcalMin())}</span><span>Prévu aujourd’hui ≈ ${fmtK(plan)}</span></div>${unknown ? `<div class="small muted" style="margin-top:6px">${unknown} repas remplacé${unknown > 1 ? 's' : ''} sans calories : ajoute une estimation pour un total juste.</div>` : ''}`;
   $('kcalRing').setAttribute('aria-label', `${fmtK(k)} calories mangées sur une limite de ${fmtK(lim)}. ${state}`);
 }
 function renderToday() {
@@ -154,6 +157,7 @@ function renderToday() {
     b.push(
       '<div class="alert danger">Le stockage du téléphone est indisponible : tes saisies risquent d’être perdues. Sauvegarde tes données.</div>',
     );
-  if (selectedDate === todayISO()) b.unshift(...profileBanners());
+  if (selectedDate === todayISO()) b.unshift(...profileBanners(), ...ruleBanners());
+  applyRulesToUI();
   $('banners').innerHTML = b.join('');
 }

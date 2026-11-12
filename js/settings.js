@@ -22,6 +22,7 @@ function renderSettings() {
   $('appVersion').textContent = 'Version ' + APP_VERSION + '.';
   if (typeof renderSync === 'function' && $('syncOwner')) renderSync();
   renderProfileCard();
+  applyRulesToUI();
   if (typeof renderFeedback === 'function') renderFeedback();
 }
 function renderAll() {

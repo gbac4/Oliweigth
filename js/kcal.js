@@ -26,7 +26,7 @@ function dayKcal(date, onlyDone) {
   }, 0);
 }
 function kcalLimit() {
-  return Math.max(KCAL_MIN, num(data.settings.kcalMax, KCAL_MAX));
+  return Math.max(kcalMin(), num(data.settings.kcalMax, KCAL_MAX));
 }
 // mangées : fait ou partiel = la portion prévue ; remplacé = l'estimation saisie ; sauté = 0
 function addsKcal(m) {
