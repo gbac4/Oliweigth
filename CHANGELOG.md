@@ -2,6 +2,9 @@
 
 Format : une entrée par version publiée sur GitHub Pages. La version s'affiche dans Réglages, tout en bas.
 
+## 2.6.1 — 2026-11-12
+- Valeurs par défaut neutres : un nouveau téléphone n'a plus de poids de départ ni de poids cible pré-remplis (#7).
+
 ## 2.6.0 — 2026-11-12
 - Remise au propre : `index.html` découpé en `css/app.css` et 13 modules dans `js/` (même comportement).
 - Tests automatisés dans `tests/` (17 tests Playwright sur écran mobile) et exécution à chaque pull request (GitHub Actions).
