@@ -80,8 +80,14 @@ function renderToday() {
     .map((code, i) => {
       const m = data.meals[code] || {nom: code, details: ''},
         v = l.meals[i] || {};
-      const opts = [...new Set([base[i], ...(OPTIONS[i] || [])])].filter((c) => data.meals[c]);
-      return `<article class="card meal-card" data-meal="${i}"><div class="row between"><div><div class="pill">${esc(SLOTS[i])} · ${esc(code)} · ≈ ${fmtK(kcalOf(code))} kcal</div><div class="meal-title" style="margin-top:7px">${esc(m.nom)}</div></div><span class="pill ${v.status === 'done' ? 'ok' : ''}">${esc(STATUS_LABEL[v.status] || 'À faire')}</span></div>${photoBlock(m)}<div class="meal-detail">${esc(m.details)}</div>${opts.length > 1 ? `<div class="field" style="margin-top:-4px"><label class="small muted">Choisir une autre option</label><select data-alt>${opts.map((c) => `<option value="${esc(c)}" ${c === code ? 'selected' : ''}>${c === base[i] ? 'Prévu : ' : ''}${esc(data.meals[c].nom)} · ≈ ${fmtK(kcalOf(c))} kcal</option>`).join('')}</select></div>` : ''}<div class="statuses">${[
+      const opts = [
+        base[i],
+        ...(code !== base[i] ? [code] : []),
+        ...equivalents(base[i], i).map((r) => r.code),
+        ...pinnedOptions(i),
+      ].filter((c, j, a) => a.indexOf(c) === j && (j < 2 || c !== code));
+      opts.forEach(ensureMeal);
+      return `<article class="card meal-card" data-meal="${i}"><div class="row between"><div><div class="pill">${esc(SLOTS[i])} · ${esc(code)} · ≈ ${fmtK(kcalOf(code))} kcal</div><div class="meal-title" style="margin-top:7px">${esc(m.nom)}</div></div><span class="pill ${v.status === 'done' ? 'ok' : ''}">${esc(STATUS_LABEL[v.status] || 'À faire')}</span></div>${photoBlock(m)}<div class="meal-detail">${esc(m.details)}</div>${opts.length > 1 ? `<div class="field" style="margin-top:-4px"><label class="small muted">Changer pour un plat équivalent (calories proches)</label><select data-alt>${opts.map((c) => `<option value="${esc(c)}" ${c === code ? 'selected' : ''}>${c === base[i] ? 'Prévu : ' : ''}${esc(data.meals[c].nom)} · ≈ ${fmtK(kcalOf(c))} kcal</option>`).join('')}</select></div>` : ''}<div class="statuses">${[
         ['done', '✅ Fait'],
         ['partial', '🟡 Partiel'],
         ['replaced', '🔄 Remplacé'],

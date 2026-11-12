@@ -2,6 +2,10 @@
 
 Format : une entrée par version publiée sur GitHub Pages. La version s'affiche dans Réglages, tout en bas.
 
+## 2.9.0 — 2026-11-12
+- Changer un repas pour un plat équivalent de la banque : même moment, calories à ±15 %, compatible avec le profil (#4). Les crêpes Flourish et les épinards aux crevettes restent proposés.
+- La liste de courses de la semaine en cours suit les plats changés.
+
 ## 2.8.0 — 2026-11-12
 - Banque de recettes (onglet Menus → Recettes) : moment, cuisine, budget, temps, calories, étiquettes (gluten, arachide, poisson, lait…), recherche, filtre « compatible avec mon profil » (#3).
 - Nouvelle personne : 5 semaines de menus proposées depuis la banque selon son profil (allergies, refus, maladie cœliaque, goûts, budget, temps, cuisine pour 2 jours).

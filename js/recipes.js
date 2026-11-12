@@ -236,3 +236,37 @@ document.addEventListener('input', (e) => {
   recipeFilter[k] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
   renderRecipes();
 });
+/* ---------- Plats équivalents (fiche #4) ----------
+   Même moment de la journée, calories à ±15 % du repas prévu, compatibles avec le profil. */
+const SLOT_MOMENT = ['P', 'C', 'R', 'C', 'R'];
+// options ajoutées à la demande, proposées même hors de la fourchette de calories
+const PINNED = {0: ['P6'], 1: ['C5'], 2: ['DCR'], 3: ['C5'], 4: ['DCR']};
+function equivalents(code, slot, max = 8) {
+  const planned = data.meals[code],
+    k0 = kcalOf(code),
+    name0 = nrm(planned?.nom),
+    ex = profileExclusions(data.profile);
+  return recipeBank()
+    .filter(
+      (r) =>
+        r.moment === SLOT_MOMENT[slot] &&
+        nrm(r.nom) !== name0 &&
+        isCompatible(r, ex) &&
+        (!k0 || Math.abs(r.kcal - k0) <= k0 * 0.15),
+    )
+    .sort((a, b) => Math.abs(a.kcal - k0) - Math.abs(b.kcal - k0))
+    .slice(0, max);
+}
+function pinnedOptions(slot) {
+  const ex = profileExclusions(data.profile);
+  return (PINNED[slot] || []).filter((c) => {
+    const r = recipeBank().find((x) => x.code === c);
+    return r && isCompatible(r, ex);
+  });
+}
+// Garantit qu'une recette de la banque est disponible dans les repas de la personne.
+function ensureMeal(code) {
+  if (data.meals[code]) return;
+  const r = recipeBank().find((x) => x.code === code);
+  if (r) data.meals[code] = {nom: r.nom, details: r.details, ing: r.ing || [], kcal: r.kcal};
+}

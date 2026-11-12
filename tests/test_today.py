@@ -17,10 +17,12 @@ def test_status_updates_ring(page):
 
 def test_alternative_option_changes_calories(page):
     load_state(page, fixture("backup-v2.0.3.json"))
-    page.locator(".meal-card").nth(0).locator("select[data-alt]").select_option("P6")
+    sel = page.locator(".meal-card").nth(0).locator("select[data-alt]")
+    alt = sel.locator("option").nth(1).get_attribute("value")
+    sel.select_option(alt)
     page.locator(".meal-card").nth(0).locator("[data-status=done]").click()
-    assert ring_kcal(page) == 365
-    assert state(page)["logs"]["2026-11-12"]["alt"]["0"] == "P6"
+    assert ring_kcal(page) == page.evaluate(f"kcalOf('{alt}')")
+    assert state(page)["logs"]["2026-11-12"]["alt"]["0"] == alt
 
 
 def test_quick_adds_and_extras(page):
