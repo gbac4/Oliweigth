@@ -155,6 +155,7 @@ async function pullMenus(force) {
     n.lastError = '';
     setSyncCfg(n);
     if (changed) {
+      data.meta.menusReviewedAt = new Date().toISOString();
       save();
       renderAll();
       toast(`Nouveaux menus reçus (${changed} semaine${changed > 1 ? 's' : ''}).`);

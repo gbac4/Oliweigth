@@ -21,6 +21,7 @@ const TAGS = {
   porc: [/jambon|porc/, 'Porc'],
   noix: [/amande|noix/, 'Noix'],
   sel: [/crevettes sechees|bouillon|jambon|feta/, 'Riche en sel'],
+  sucre: [/miel|sirop|sucre|jus de fruit|chocolat/, 'Sucres ajoutés'],
   fer: [/epinard|lentille|haricot|boeuf|pois chiche|sardine|okok/, 'Riche en fer'],
 };
 // mots d'une allergie ou d'un refus → étiquette
@@ -86,7 +87,7 @@ function profileExclusions(p) {
   const tags = new Set(),
     words = [];
   if (!p) return {tags, words};
-  if ((p.sante || []).includes('coeliaque')) tags.add('gluten');
+  healthExcludedTags(p).forEach((t) => tags.add(t));
   const scan = (txt, isRefus) =>
     nrm(txt)
       .split(/[,;/]| et /)
@@ -123,6 +124,7 @@ function scoreRecipe(r, p) {
     .filter((w) => w.length >= 3);
   if (likes.some((w) => r.text.includes(w))) s += 3;
   if (p?.budget === 'serre') s += r.budget === 'serre' ? 2 : r.budget === 'confortable' ? -2 : 0;
+  if ((p?.sante || []).includes('anemie') && r.tags.includes('fer')) s += 2;
   if (p?.temps === 'court') s += r.temps === 'court' ? 2 : r.temps === 'long' ? -2 : 0;
   return s;
 }
@@ -182,6 +184,7 @@ function proposeMenusFromBank() {
   data.weeks = weeks.slice(1).map((w) => ({...w, meals: {}, basePlan: w.plan, swaps: []}));
   data.history = {};
   data.meta.menusFrom = 'banque';
+  data.meta.menusReviewedAt = new Date().toISOString();
   save();
 }
 /* ---------- Écran « Recettes » ---------- */

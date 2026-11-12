@@ -36,7 +36,7 @@ function goalStats() {
     lost = start - cur,
     left = Math.max(0, cur - target),
     pct = total > 0 ? Math.min(100, Math.max(0, (lost / total) * 100)) : 0;
-  const rate = Math.min(0.5, num(s.targetLoss, 0.5)),
+  const rate = weeklyLoss(),
     planDate = rate > 0 && left > 0 ? addWeeks(lastDate, left / rate) : null;
   // rythme réel : régression linéaire, au moins 3 pesées sur 14 jours
   let real = null,
@@ -138,7 +138,7 @@ function drawChart() {
     end = lastD > todayISO() ? lastD : todayISO(),
     span = Math.max(1, (dateObj(end) - dateObj(start)) / 864e5),
     base = num(data.settings.startWeight, ws[0].kg),
-    loss = num(data.settings.targetLoss, 0.5),
+    loss = weeklyLoss(),
     targetAt = (d) => base - loss * ((dateObj(d) - dateObj(start)) / 6048e5);
   const vals = ws.map((w) => num(w.kg)).concat([base, targetAt(end)]),
     min = Math.floor(Math.min(...vals) - 1),
