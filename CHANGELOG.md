@@ -2,6 +2,9 @@
 
 Format : une entrée par version publiée sur GitHub Pages. La version s'affiche dans Réglages, tout en bas.
 
+## 2.10.0 — 2026-11-12
+- « Donner mon avis » dans Réglages : note 1-5, écran concerné, commentaire, capture facultative ; envoyé dans le repo privé (feedback/), gardé en attente si hors ligne (#6).
+
 ## 2.9.0 — 2026-11-12
 - Changer un repas pour un plat équivalent de la banque : même moment, calories à ±15 %, compatible avec le profil (#4). Les crêpes Flourish et les épinards aux crevettes restent proposés.
 - La liste de courses de la semaine en cours suit les plats changés.
