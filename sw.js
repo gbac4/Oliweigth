@@ -20,7 +20,8 @@ const CORE = [
   './js/progress.js',
   './js/settings.js',
   './js/sync.js',
-  './js/profile.js', './js/app.js',
+  './js/profile.js',
+  './js/app.js',
 ];
 
 self.addEventListener('install', (event) => {
