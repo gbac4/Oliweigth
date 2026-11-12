@@ -16,6 +16,7 @@
 <body>
 <header><div class="brand">Oli<span>Weight</span></div><div class="date-small" id="headerDate"></div></header>
 <main>
+<section class="screen" id="onboarding"></section>
 <section class="screen active" id="today">
  <div class="heading"><div><h1>Aujourd’hui</h1><div class="muted small" id="todayLabel"></div></div><div class="row"><button id="prevDay" aria-label="Jour précédent">‹</button><button id="nextDay" aria-label="Jour suivant">›</button></div></div>
  <div id="banners"></div><div class="card ring-card" id="kcalRing"></div><div class="metric-grid" id="todayMetrics"></div>
@@ -76,6 +77,7 @@
 <section class="screen" id="settings">
  <div class="heading"><div><h1>Réglages</h1><div class="muted small">Préférences et données</div></div></div>
  <div class="card"><h2>Envoyer le suivi</h2><p class="small muted">Le dimanche : copie le résumé et envoie-le par WhatsApp.</p><div class="row wrap"><button class="primary grow" id="weeklyCopy">📋 Copier le résumé</button><button id="weeklyShare">Partager</button></div></div>
+ <div class="card"><h2>Mon profil</h2><p class="small muted">Sert à adapter les menus. Si ta situation change (fin d’allaitement, maladie…), mets-le à jour.</p><div id="profileForm"></div><div id="profileWarn"></div><div id="profileErr" class="alert danger hidden"></div><button class="primary" id="profileSave" style="width:100%">Enregistrer mon profil</button></div>
  <div class="card"><h2>Objectifs et préférences</h2>
   <div class="field"><label for="startWeight">Poids de départ (kg)</label><input id="startWeight" type="number" min="20" max="400" step=".1" inputmode="decimal"></div>
   <div class="field"><label for="startDate">Date de départ</label><input id="startDate" type="date"></div>
@@ -117,5 +119,6 @@
 <script src="./js/progress.js"></script>
 <script src="./js/settings.js"></script>
 <script src="./js/sync.js"></script>
+<script src="./js/profile.js"></script>
 <script src="./js/app.js"></script>
 </body></html>

@@ -2,6 +2,11 @@
 
 Format : une entrée par version publiée sur GitHub Pages. La version s'affiche dans Réglages, tout en bas.
 
+## 2.7.0 — 2026-11-12
+- Profil modifiable dans Réglages (santé, allaitement, grossesse, allergies, goûts, budget, temps, foyer) (#2).
+- Écran de premier lancement pour une nouvelle personne ; réservé aux 18 ans et plus ; conseils de validation médicale selon la situation.
+- Profil inclus dans le résumé de la semaine.
+
 ## 2.6.1 — 2026-11-12
 - Valeurs par défaut neutres : un nouveau téléphone n'a plus de poids de départ ni de poids cible pré-remplis (#7).
 

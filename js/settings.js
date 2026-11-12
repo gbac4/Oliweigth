@@ -21,6 +21,7 @@ function renderSettings() {
     : 'Aucune sauvegarde pour l’instant.';
   $('appVersion').textContent = 'Version ' + APP_VERSION + '.';
   if (typeof renderSync === 'function' && $('syncOwner')) renderSync();
+  renderProfileCard();
 }
 function renderAll() {
   renderToday();

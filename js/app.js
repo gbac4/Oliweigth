@@ -504,6 +504,19 @@ if (data.meta.migratedFrom && !data.meta.migrationShown) {
   save();
   setTimeout(() => toast('Nouvelle version : tes données ont été reprises.'), 600);
 }
+$('profileSave').addEventListener('click', () => {
+  const res = readProfileForm($('profileForm'));
+  if (res.errors.length) {
+    $('profileErr').textContent = 'À corriger : ' + res.errors.join(' · ');
+    $('profileErr').classList.remove('hidden');
+    return;
+  }
+  $('profileErr').classList.add('hidden');
+  applyProfile(res);
+  renderAll();
+  toast('Profil enregistré.');
+});
 renderAll();
+if (isNewUser()) showOnboarding();
 loadPhotos();
 if (syncOn()) setTimeout(() => syncAll(false), 1500);

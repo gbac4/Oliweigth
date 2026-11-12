@@ -148,5 +148,6 @@ function renderToday() {
     b.push(
       '<div class="alert danger">Le stockage du téléphone est indisponible : tes saisies risquent d’être perdues. Sauvegarde tes données.</div>',
     );
+  if (selectedDate === todayISO()) b.unshift(...profileBanners());
   $('banners').innerHTML = b.join('');
 }
