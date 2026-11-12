@@ -1,0 +1,162 @@
+{
+ "version": 1,
+ "settings": {
+  "startWeight": 100.0,
+  "startDate": "2026-11-09",
+  "rate": 0.5,
+  "waterGoal": 10,
+  "stepsGoal": 5000,
+  "weighDay": 1,
+  "reminder": "20:00",
+  "menuLabel": "Menus semaine 1"
+ },
+ "meals": {
+  "P1": {
+   "name": "Salade + sardines",
+   "details": "Laitue, chou rouge, tomate, concombre, carotte, oignon + 1 boîte de sardines égouttées + 1 œuf + 1 tranche de pain complet. Vinaigrette : 1 c. à soupe d'huile + vinaigre."
+  },
+  "P2": {
+   "name": "Salade + œufs, avocat, fromage",
+   "details": "Salade de base + 2 œufs + ¼ d'avocat + 30 g de fromage + 1 tranche de pain complet. Dimanche : pommes de terre au four au lieu du pain."
+  },
+  "P3": {
+   "name": "Yaourt grec, fruit, œuf",
+   "details": "¾ de tasse de yaourt grec nature + 1 fruit + 1 œuf + 1 tranche de pain complet."
+  },
+  "C1": {
+   "name": "Fruit entier",
+   "details": "1 fruit entier (pas de jus)."
+  },
+  "C2": {
+   "name": "Whey + fruit",
+   "details": "1 dose de whey dans de l'eau ou du lait 1 % + 1 fruit."
+  },
+  "D1": {
+   "name": "Poulet grillé, gombo sauté",
+   "details": "Poulet grillé (paume) + gombo sauté + 2 petites pommes de terre bouillies."
+  },
+  "D2": {
+   "name": "Haricots aux légumes",
+   "details": "Haricots aux légumes + salade de crudités. Les haricots comptent comme féculent."
+  },
+  "D3": {
+   "name": "Bol méditerranéen",
+   "details": "Poulet + ½ tasse de pois chiches + crudités + 1 c. à soupe d'huile d'olive."
+  },
+  "D4": {
+   "name": "Maquereau ou sardines grillés",
+   "details": "Poisson grillé + épinards sautés + 1 taro."
+  },
+  "D5": {
+   "name": "Sauté asiatique poulet-légumes",
+   "details": "Poulet et légumes sautés + ¾ de tasse de spaghetti ou de nouilles."
+  },
+  "D6": {
+   "name": "Curry de lentilles",
+   "details": "Curry de lentilles aux légumes + ½ tasse de riz."
+  },
+  "D7": {
+   "name": "Okok allégé au bœuf maigre",
+   "details": "Okok (moitié moins d'huile et d'arachide) + ½ bâton de manioc."
+  },
+  "S-A": {
+   "name": "Poisson braisé sauce tomate + plantain",
+   "details": "Tilapia ou maquereau, sauce tomate-oignons-poivrons-épinards, 1 c. à soupe d'huile par personne + ½ plantain bouilli."
+  },
+  "S-B": {
+   "name": "Poulet aux légumes + riz",
+   "details": "Poulet sans peau, beaucoup de légumes, 1 c. à soupe d'huile par personne + ¾ de tasse de riz cuit."
+  },
+  "S-C": {
+   "name": "Sauce gombo au bœuf maigre + couscous de maïs",
+   "details": "Gombo et épinards, 1 c. à soupe d'huile de palme par personne, bœuf maigre + crevettes séchées + 1 petite boule de couscous."
+  },
+  "S-D": {
+   "name": "Poisson grillé, épinards, taro",
+   "details": "Grillade rapide du dimanche : poisson grillé + épinards sautés + 1 taro."
+  }
+ },
+ "plan": {
+  "1": [
+   "P1",
+   "C1",
+   "D1",
+   "C2",
+   "S-A"
+  ],
+  "2": [
+   "P2",
+   "C1",
+   "D2",
+   "C2",
+   "S-A"
+  ],
+  "3": [
+   "P3",
+   "C1",
+   "D3",
+   "C2",
+   "S-B"
+  ],
+  "4": [
+   "P1",
+   "C1",
+   "D4",
+   "C2",
+   "S-B"
+  ],
+  "5": [
+   "P2",
+   "C1",
+   "D5",
+   "C2",
+   "S-C"
+  ],
+  "6": [
+   "P3",
+   "C1",
+   "D6",
+   "C2",
+   "S-C"
+  ],
+  "7": [
+   "P2",
+   "C1",
+   "D7",
+   "C2",
+   "S-D"
+  ]
+ },
+ "logs": {
+  "2026-11-09": {
+   "meals": {
+    "P": {
+     "status": "partiel",
+     "reasons": [
+      "Ingrédient remplacé"
+     ],
+     "replaced": ""
+    },
+    "C1": {
+     "status": "remplace",
+     "reasons": [],
+     "replaced": "Thé vert test"
+    },
+    "D": {
+     "status": "remplace",
+     "reasons": [],
+     "replaced": "Repas de remplacement test"
+    }
+   },
+   "water": 2,
+   "steps": "",
+   "feedsDay": 3,
+   "feedsNight": 1,
+   "sleep": "",
+   "energy": 0,
+   "hunger": 0,
+   "note": ""
+  }
+ },
+ "weights": []
+}

@@ -1,0 +1,22 @@
+name: Tests
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - name: Syntaxe JS
+        run: for f in js/*.js sw.js; do node --check "$f"; done
+      - name: Formatage (prettier)
+        run: npx --yes prettier@3 --print-width 120 --single-quote --no-bracket-spacing --check "js/*.js" sw.js css/app.css
+      - name: Dépendances de test
+        run: pip install -r tests/requirements.txt && python -m playwright install --with-deps chromium
+      - name: Tests navigateur (écran mobile)
+        run: cd tests && python -m pytest -q
