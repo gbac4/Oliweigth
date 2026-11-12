@@ -2,6 +2,10 @@
 
 Format : une entrée par version publiée sur GitHub Pages. La version s'affiche dans Réglages, tout en bas.
 
+## 2.8.0 — 2026-11-12
+- Banque de recettes (onglet Menus → Recettes) : moment, cuisine, budget, temps, calories, étiquettes (gluten, arachide, poisson, lait…), recherche, filtre « compatible avec mon profil » (#3).
+- Nouvelle personne : 5 semaines de menus proposées depuis la banque selon son profil (allergies, refus, maladie cœliaque, goûts, budget, temps, cuisine pour 2 jours).
+
 ## 2.7.0 — 2026-11-12
 - Profil modifiable dans Réglages (santé, allaitement, grossesse, allergies, goûts, budget, temps, foyer) (#2).
 - Écran de premier lancement pour une nouvelle personne ; réservé aux 18 ans et plus ; conseils de validation médicale selon la situation.
