@@ -981,9 +981,35 @@ details.fold[open] > summary::after {
   background: var(--surface2);
 }
 /* Créer ma recette (fiche #19) */
-.cr-row{display:grid;grid-template-columns:90px 1fr 44px;gap:6px;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--line,#eee)}
-.cr-row>select:first-child{grid-column:1/-1}
-.cr-row select,.cr-row input{min-width:0;width:100%}
-.cr-label{grid-column:1/-1;display:flex;align-items:center;gap:6px}
-.cr-label input{width:80px}
-.portion-opt{border:1px solid var(--line,#ddd);border-radius:10px;padding:8px 10px;margin:8px 0}
+.cr-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 44px;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line, #eee);
+}
+.cr-row > select:first-child {
+  grid-column: 1/-1;
+}
+.cr-row select,
+.cr-row input {
+  min-width: 0;
+  width: 100%;
+}
+.cr-label {
+  grid-column: 1/-1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.cr-label input {
+  width: 80px;
+}
+.portion-opt {
+  border: 1px solid var(--line, #ddd);
+  border-radius: 10px;
+  padding: 8px 10px;
+  margin: 8px 0;
+}
