@@ -232,6 +232,10 @@ function summaryText() {
           if (m.status === 'replaced' && m.replacement)
             t += ` (${m.replacement}${num(m.kcal) > 0 ? ', ≈ ' + fmtK(m.kcal) + ' kcal' : ''})`;
           if (m.adds?.length) t += ` [+${m.adds.map((a) => a.label).join(', ')}]`;
+          if (m.swapIng && Object.keys(m.swapIng).length)
+            t += ` {${Object.values(m.swapIng)
+              .map((x) => (x.repl ? `${x.name}→${x.repl}` : `sans ${x.name}`))
+              .join(', ')} : ${swapDelta(m) >= 0 ? '+' : ''}${Math.round(swapDelta(m))} kcal}`;
           return t;
         })
         .join(' · ');

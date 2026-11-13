@@ -2,6 +2,9 @@
 
 Format : une entrée par version publiée sur GitHub Pages. La version s'affiche dans Réglages, tout en bas.
 
+## 3.2.0 — 2026-11-13
+- Ingrédient absent (#17) : toucher un ingrédient → « Sans » (ses calories sont retirées) ou « Remplacé par… » (équivalent de la même famille, différence de calories). L'anneau, le repas, le résumé et l'analyse utilisent le total ajusté ; l'ingrédient part dans les Manquants. Changer de plat entier devient une option repliée.
+
 ## 3.1.0 — 2026-11-13
 - Ingrédients manquants (#15) : sur chaque repas, toucher un ingrédient « Je ne l'ai pas » l'ajoute aux Manquants des courses et propose jusqu'à 3 plats équivalents sans cet ingrédient.
 - Garde-manger : « J'en ai » / « À acheter » ; les produits de base restent cochés d'une semaine à l'autre, les produits frais repartent à zéro. La liste envoyée ne contient que ce qui est à acheter, manquants en premier.

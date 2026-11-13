@@ -53,25 +53,135 @@ function substitutesFor(baseCode, slot) {
     .filter((r) => !(r.ing || []).some((x) => miss.includes(parseIng(x).key)))
     .slice(0, 3);
 }
+/* ---------- Ingrédient absent : sans ou remplacé (fiche #17) ----------
+   Le total du plat est réparti entre ses ingrédients selon une portion type, puis remis à l'échelle
+   pour que la somme corresponde aux calories du plat. Estimation, pas une pesée. */
+const ING_KCAL = [
+  [/huile/, 120],
+  [/avocat/, 80],
+  [/petits fruits/, 35],
+  [/banane/, 100],
+  [/fruit/, 80],
+  [/crevettes sechees/, 40],
+  [/crevette/, 160],
+  [/jambon/, 40],
+  [/thon/, 130],
+  [/oeuf/, 140],
+  [/poulet|boeuf|dindon|porc|viande/, 240],
+  [/sardine|maquereau|tilapia|saumon|truite|poisson/, 230],
+  [/riz/, 205],
+  [/pates|spaghetti|nouilles/, 200],
+  [/plantain/, 180],
+  [/taro/, 190],
+  [/patate douce/, 170],
+  [/pomme de terre|pommes de terre/, 160],
+  [/pain|tortilla|pita/, 90],
+  [/haricot|lentille|pois chiche|pois casses/, 200],
+  [/couscous|quinoa|orge|farine/, 180],
+  [/manioc/, 160],
+  [/flocons|avoine/, 150],
+  [/mais/, 70],
+  [/petits pois/, 60],
+  [/yaourt/, 130],
+  [/fromage|feta/, 100],
+  [/lait de coco/, 50],
+  [/lait/, 80],
+  [/chia/, 60],
+  [/amande|noix/, 85],
+  [/houmous/, 100],
+  [/arachide/, 95],
+  [/whey/, 120],
+  [/flourish|melange/, 280],
+  [/miel|sirop|sucre/, 20],
+  [/vinaigre|epice|ail|curry|cari|cumin|paprika|thym|cannelle|aneth|moutarde|bouillon|citron|chili/, 3],
+];
+function typicalKcal(name) {
+  const n = nrm(name);
+  for (const [re, k] of ING_KCAL) if (re.test(n)) return k;
+  return 20; // légume
+}
+// Calories estimées de chaque ingrédient du plat (clé → kcal)
+function ingShares(code, meal) {
+  const items = (meal?.ing || []).map(parseIng),
+    raw = items.map((it) => typicalKcal(it.name)),
+    sum = raw.reduce((a, b) => a + b, 0) || 1,
+    f = kcalOf(code, meal) / sum,
+    out = {};
+  items.forEach((it, i) => (out[it.key] = Math.round(raw[i] * f)));
+  return out;
+}
+const SUBS = {
+  P: [
+    ['Poisson', 230],
+    ['Œufs (2)', 140],
+    ['Haricots (¾ tasse)', 165],
+    ['Thon en conserve', 130],
+    ['Poulet', 240],
+  ],
+  F: [
+    ['Riz (¾ tasse)', 155],
+    ['Plantain (½)', 135],
+    ['Pâtes (¾ tasse)', 150],
+    ['Pomme de terre', 160],
+    ['Pain complet (1 tranche)', 80],
+    ['Taro', 150],
+  ],
+  O: [
+    ['Yaourt nature', 100],
+    ['Lait 1 % (1 verre)', 105],
+    ['Fromage (30 g)', 110],
+  ],
+  L: [
+    ['Un autre légume', 20],
+    ['Un fruit', 80],
+  ],
+  E: [],
+};
+function swapDelta(m) {
+  return Object.values(m?.swapIng || {}).reduce((t, s) => t + (num(s.replKcal) - num(s.kcal)), 0);
+}
+function mealKcal(code, m) {
+  return kcalOf(code) + swapDelta(m);
+}
+let ingOpen = null; // {meal, key}
 function ingredientBlock(code, m, slot, baseCode) {
   const items = (m.ing || []).map(parseIng);
   if (!items.length) return '';
-  const anyMissing = items.some((it) => isMissing(it.key));
-  const subs = anyMissing ? substitutesFor(baseCode, slot) : [];
+  const v = (data.logs[selectedDate]?.meals || {})[slot] || {},
+    sw = v.swapIng || {},
+    shares = ingShares(code, m),
+    openKey = ingOpen && ingOpen.meal === slot ? ingOpen.key : null;
+  const chip = (it) => {
+    const s = sw[it.key],
+      label = s ? (s.repl ? `${it.name} → ${s.repl}` : `Sans ${it.name.toLowerCase()}`) : it.name;
+    return `<button type="button" class="ing ${s ? 'miss' : ''}" data-ing="${esc(it.key)}" aria-expanded="${openKey === it.key}">${esc(label)}</button>`;
+  };
+  let panel = '';
+  const it = items.find((x) => x.key === openKey);
+  if (it) {
+    const k0 = shares[it.key] || 0,
+      d = (n) => `${n - k0 >= 0 ? '+' : '−'}${fmtK(Math.abs(n - k0))} kcal`;
+    panel = `<div class="ing-panel"><div class="small"><b>${esc(it.name)}</b> ≈ ${fmtK(k0)} kcal dans ce plat. Tu ne l’as pas :</div><div class="ing-list" style="margin-top:6px">
+      <button type="button" class="small-btn" data-ing-sans="${esc(it.key)}">Sans (${d(0)})</button>
+      ${(SUBS[it.cat] || [])
+        .filter(([n]) => !nrm(n).includes(nrm(it.name).split(' ')[0].replace(/s$/, '')))
+        .map(
+          ([n, k]) =>
+            `<button type="button" class="small-btn" data-ing-repl="${esc(n)}" data-ing-k="${k}" data-ing-key="${esc(it.key)}">${esc(n)} (${d(k)})</button>`,
+        )
+        .join('')}
+      ${sw[it.key] ? `<button type="button" class="small-btn" data-ing-undo="${esc(it.key)}">Annuler : je l’ai</button>` : ''}</div></div>`;
+  }
+  const anySw = Object.keys(sw).length,
+    subs = anySw ? substitutesFor(baseCode, slot) : [];
   subs.forEach((r) => ensureMeal(r.code));
-  return `<div class="ing-box"><div class="small muted" style="margin-bottom:6px">Ingrédients — touche ceux que tu n’as pas :</div><div class="ing-list">${items
-    .map(
-      (it) =>
-        `<button type="button" class="ing ${isMissing(it.key) ? 'miss' : ''}" data-miss="${esc(it.key)}" data-miss-name="${esc(it.name)}" data-miss-cat="${it.cat}" aria-pressed="${isMissing(it.key)}">${isMissing(it.key) ? '✕ ' : ''}${esc(it.name)}</button>`,
-    )
-    .join('')}</div>${
-    anyMissing
-      ? `<div class="small" style="margin-top:8px">Ajouté à tes courses (Manquants).${subs.length ? ' Pour aujourd’hui, sans cet ingrédient :' : ' Aucun plat équivalent sans cet ingrédient : garde le repas ou note « Remplacé ».'}</div>${subs
-          .map(
-            (r) =>
-              `<button type="button" class="small-btn" data-take="${esc(r.code)}" style="margin:6px 6px 0 0">Prendre : ${esc(r.nom)} · ${fmtK(r.kcal)} kcal</button>`,
-          )
-          .join('')}`
+  return `<div class="ing-box"><div class="small muted" style="margin-bottom:6px">Ingrédients — touche celui que tu n’as pas :</div><div class="ing-list">${items.map(chip).join('')}</div>${panel}${
+    anySw
+      ? `<div class="small" style="margin-top:8px">Calories du repas ajustées : ${swapDelta(v) >= 0 ? '+' : '−'}${fmtK(Math.abs(swapDelta(v)))} kcal. Les ingrédients absents sont ajoutés à tes courses.</div>${
+          subs.length
+            ? `<details class="fold" style="margin-top:6px"><summary class="small">Ou changer de plat entier</summary>${subs.map((r) => `<button type="button" class="small-btn" data-take="${esc(r.code)}" style="margin:6px 6px 0 0">${esc(r.nom)} · ${fmtK(r.kcal)} kcal</button>`).join('')}</details>`
+            : ''
+        }`
       : ''
   }</div>`;
 }

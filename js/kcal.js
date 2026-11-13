@@ -44,7 +44,7 @@ function eatenKcal(date) {
     const m = l.meals?.[i];
     if (m && m.status !== 'skipped') k += addsKcal(m);
     if (!m?.status) return;
-    if (m.status === 'done' || m.status === 'partial') k += kcalOf(c);
+    if (m.status === 'done' || m.status === 'partial') k += kcalOf(c) + swapDelta(m);
     else if (m.status === 'replaced') {
       if (num(m.kcal) > 0) k += num(m.kcal);
       else unknown++;
