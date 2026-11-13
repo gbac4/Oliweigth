@@ -20,11 +20,37 @@ $('today').addEventListener('click', (e) => {
     renderToday();
     return;
   }
-  const mi = e.target.closest('[data-miss]');
-  if (mi) {
-    const it = {key: mi.dataset.miss, name: mi.dataset.missName, cat: mi.dataset.missCat};
-    if (isMissing(it.key)) delete missingMap()[it.key];
-    else markMissing(it);
+  const ig = e.target.closest('[data-ing],[data-ing-sans],[data-ing-repl],[data-ing-undo]');
+  if (ig) {
+    const i = Number(ig.closest('[data-meal]').dataset.meal),
+      code = effCode(selectedDate, i),
+      meal = data.meals[code] || {},
+      key = ig.dataset.ing || ig.dataset.ingSans || ig.dataset.ingKey || ig.dataset.ingUndo,
+      it = (meal.ing || []).map(parseIng).find((x) => x.key === key);
+    if (ig.dataset.ing !== undefined) {
+      ingOpen = ingOpen && ingOpen.meal === i && ingOpen.key === key ? null : {meal: i, key};
+      renderToday();
+      return;
+    }
+    const l = logFor(selectedDate),
+      m = (l.meals[i] = l.meals[i] || {});
+    m.swapIng = m.swapIng || {};
+    if (ig.dataset.ingUndo !== undefined) {
+      delete m.swapIng[key];
+      delete missingMap()[key];
+    } else if (it) {
+      const k0 = ingShares(code, meal)[key] || 0;
+      m.swapIng[key] = {
+        name: it.name,
+        kcal: k0,
+        repl: ig.dataset.ingRepl || null,
+        replKcal: ig.dataset.ingRepl ? num(ig.dataset.ingK) : 0,
+      };
+      markMissing(it);
+    }
+    if (!Object.keys(m.swapIng).length) delete m.swapIng;
+    if (!Object.keys(m).length) delete l.meals[i];
+    ingOpen = null;
     save();
     renderToday();
     return;
@@ -57,7 +83,8 @@ $('today').addEventListener('click', (e) => {
     m.status = m.status === want ? undefined : want;
     if (want === 'partial' || want === 'replaced') openMeals.add(Number(i));
     m.code = effCode(selectedDate, i);
-    if (!m.status) delete l.meals[i];
+    if (!m.status && !m.swapIng) delete l.meals[i];
+    else if (!m.status) delete m.status;
     else {
       if (m.status !== 'partial') m.reasons = [];
       if (m.status !== 'replaced') m.replacement = '';

@@ -7,31 +7,50 @@ def shop(page):
     page.click("[data-menutab=shop]")
 
 
-def test_missing_ingredient_goes_to_shopping_and_suggests(page):
+def ring(page):
+    return int(page.text_content(".ring-center strong").replace("\u202f", "").replace(" ", ""))
+
+
+def test_without_ingredient_lowers_kcal_and_adds_to_shopping(page):
     load_state(page, fixture("backup-v2.0.3.json"))
-    card = open_meal(page, 4)  # souper S-B : poulet aux légumes + riz
-    card.locator('[data-miss="poulet"]').click()
-    card = open_meal(page, 4)
-    assert "miss" in card.locator('[data-miss="poulet"]').get_attribute("class")
-    takes = card.locator("[data-take]")
-    assert takes.count() >= 1
-    code = takes.first.get_attribute("data-take")
-    ing = page.evaluate(f"(data.meals['{code}'].ing||[]).join(' ').toLowerCase()")
-    assert "poulet" not in ing
-    takes.first.click()
-    assert state(page)["logs"]["2026-11-12"]["alt"]["4"] == code
-    shop(page)
+    card = open_meal(page, 4)  # souper S-B : poulet aux légumes + riz (520 kcal)
+    card.locator("[data-quick=done]").click()
+    before = ring(page)
+    open_meal(page, 4).locator('[data-ing="riz"]').click()
+    share = page.evaluate("ingShares('S-B', data.meals['S-B'])['riz']")
+    assert share > 100
+    open_meal(page, 4).locator('[data-ing-sans="riz"]').click()
+    assert ring(page) == before - share
+    assert "Sans riz" in open_meal(page, 4).locator(".ing-list").first.text_content()
+    page.click("[data-screen=menus]")
+    page.click("[data-menutab=shop]")
     assert "Manquants (1)" in page.text_content("#shopList")
-    assert page.evaluate("shopText()").split("\n")[2] == "MANQUANTS"
+
+
+def test_replaced_ingredient_uses_difference(page):
+    load_state(page, fixture("backup-v2.0.3.json"))
+    open_meal(page, 4).locator("[data-quick=done]").click()
+    before = ring(page)
+    share = page.evaluate("ingShares('S-B', data.meals['S-B'])['riz']")
+    open_meal(page, 4).locator('[data-ing="riz"]').click()
+    open_meal(page, 4).locator('[data-ing-repl^="Plantain"]').click()
+    assert ring(page) == before - share + 135
+    assert "Riz→Plantain" in page.evaluate("summaryText()")
+    # annuler
+    open_meal(page, 4).locator('[data-ing="riz"]').click()
+    open_meal(page, 4).locator('[data-ing-undo="riz"]').click()
+    assert ring(page) == before
+    assert state(page)["missing"] == {}
 
 
 def test_buying_missing_item_clears_it(page):
     load_state(page, fixture("backup-v2.0.3.json"))
-    open_meal(page, 4).locator('[data-miss="poulet"]').click()
-    shop(page)
+    open_meal(page, 4).locator('[data-ing="poulet"]').click()
+    open_meal(page, 4).locator('[data-ing-sans="poulet"]').click()
+    page.click("[data-screen=menus]")
+    page.click("[data-menutab=shop]")
     page.locator('#shopList [data-shop="poulet"]').check()
     assert state(page)["missing"] == {}
-    assert "Manquants" not in page.text_content("#shopList")
 
 
 def test_staples_persist_across_weeks_fresh_do_not(page):
