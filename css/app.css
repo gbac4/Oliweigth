@@ -1013,3 +1013,21 @@ details.fold[open] > summary::after {
   padding: 8px 10px;
   margin: 8px 0;
 }
+/* Nombre de repas du jour (fiche #21) */
+.mealcount {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 0 0 10px;
+}
+.mealcount button {
+  min-height: 36px;
+  min-width: 40px;
+  padding: 4px 10px;
+}
+.mealcount button.active {
+  background: var(--brand);
+  color: #fff;
+  border-color: var(--brand);
+}

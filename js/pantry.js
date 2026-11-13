@@ -140,8 +140,8 @@ const SUBS = {
 function swapDelta(m) {
   return Object.values(m?.swapIng || {}).reduce((t, s) => t + (num(s.replKcal) - num(s.kcal)), 0);
 }
-function mealKcal(code, m) {
-  return kcalOf(code) + swapDelta(m);
+function mealKcal(code, m, date, i) {
+  return (date ? slotKcal(date, i, code) : kcalOf(code)) + swapDelta(m);
 }
 let ingOpen = null; // {meal, key}
 function ingredientBlock(code, m, slot, baseCode) {

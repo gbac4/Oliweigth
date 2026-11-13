@@ -5,9 +5,9 @@
 function prof() {
   return data.profile || {};
 }
-// Une personne déjà en place sans profil complet est considérée comme allaitante (utilisatrice d'origine).
+// Allaitement seulement s'il est déclaré (fiche #21 : on ne le suppose plus sans réponse).
 function isBreastfeeding() {
-  return prof().allaitement !== false;
+  return prof().allaitement === true && prof().sexe !== 'H';
 }
 function isPaused() {
   return !!(prof().pause || prof().grossesse);
@@ -63,4 +63,6 @@ function applyRulesToUI() {
   if (tl) tl.max = String(maxLoss());
   const km = $('kcalMax');
   if (km) km.min = String(kcalMin());
+  const kc = $('kcalCalc');
+  if (kc) kc.textContent = energyText();
 }

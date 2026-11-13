@@ -12,6 +12,16 @@ const HEALTH = [
 const PROFILE_FIELDS = [
   {k: 'prenom', label: 'Prénom', type: 'text', max: 40, req: true},
   {k: 'age', label: 'Âge', type: 'number', min: 10, max: 110, req: true},
+  {
+    k: 'sexe',
+    label: 'Sexe (pour le calcul des calories)',
+    type: 'select',
+    req: true,
+    opts: [
+      ['F', 'Femme'],
+      ['H', 'Homme'],
+    ],
+  },
   {k: 'taille', label: 'Taille (cm)', type: 'number', min: 120, max: 230},
   {k: 'startWeight', label: 'Poids actuel (kg)', type: 'number', min: 30, max: 400, step: 0.1, set: true, req: true},
   {k: 'targetWeight', label: 'Poids visé (kg)', type: 'number', min: 30, max: 400, step: 0.1, set: true},
@@ -26,8 +36,39 @@ const PROFILE_FIELDS = [
       ['elevee', 'Élevée (sport presque tous les jours)'],
     ],
   },
-  {k: 'allaitement', label: 'J’allaite', type: 'yesno'},
-  {k: 'grossesse', label: 'Je suis enceinte', type: 'yesno'},
+  {k: 'allaitement', label: 'J’allaite', type: 'yesno', show: (p) => p.sexe === 'F'},
+  {
+    k: 'bebeAge',
+    label: 'Âge du bébé',
+    type: 'select',
+    show: (p) => p.sexe === 'F' && p.allaitement,
+    opts: [
+      ['0-6', '0 à 6 mois'],
+      ['7+', '7 mois et plus'],
+    ],
+  },
+  {
+    k: 'allaitementType',
+    label: 'Allaitement',
+    type: 'select',
+    show: (p) => p.sexe === 'F' && p.allaitement,
+    opts: [
+      ['exclusif', 'Exclusif (seulement le sein)'],
+      ['partiel', 'Partiel (avec lait infantile ou aliments)'],
+    ],
+  },
+  {k: 'grossesse', label: 'Je suis enceinte', type: 'yesno', show: (p) => p.sexe === 'F'},
+  {
+    k: 'repas',
+    label: 'Combien de fois je mange par jour',
+    type: 'select',
+    def: '5',
+    opts: [
+      ['5', '5 fois (3 repas + 2 collations)'],
+      ['4', '4 fois (3 repas + 1 collation)'],
+      ['3', '3 repas'],
+    ],
+  },
   {k: 'pause', label: 'Je suis malade / en pause du programme', type: 'yesno'},
   {k: 'sante', label: 'Santé (coche ce qui s’applique)', type: 'checks', opts: HEALTH},
   {k: 'medicaments', label: 'Médicaments réguliers (facultatif)', type: 'text', max: 120},
@@ -67,6 +108,25 @@ function profileFormHTML(prefix) {
   const p = data.profile || {},
     s = data.settings;
   return PROFILE_FIELDS.map((f) => {
+    const html = fieldHTML(f, prefix, p, s);
+    return `<div data-fk="${f.k}" class="${f.show && !f.show(p) ? 'hidden' : ''}">${html}</div>`;
+  }).join('');
+}
+// Cases affichées selon les réponses (allaitement seulement pour une femme, etc.)
+function refreshProfileVisibility(root) {
+  const v = (k) => root.querySelector(`[data-pf="${k}"]`)?.value,
+    p = {sexe: v('sexe'), allaitement: v('allaitement') === 'oui'};
+  PROFILE_FIELDS.filter((f) => f.show).forEach((f) =>
+    root.querySelector(`[data-fk="${f.k}"]`)?.classList.toggle('hidden', !f.show(p)),
+  );
+}
+document.addEventListener('change', (e) => {
+  const k = e.target.dataset?.pf;
+  if (k === 'sexe' || k === 'allaitement')
+    refreshProfileVisibility(e.target.closest('#obForm, #profileForm') || document);
+});
+function fieldHTML(f, prefix, p, s) {
+  {
     const id = prefix + f.k,
       v = f.set ? (s[f.k] ?? '') : (p[f.k] ?? f.def ?? ''),
       req = f.req ? ' <span class="muted">*</span>' : '';
@@ -83,7 +143,7 @@ function profileFormHTML(prefix) {
         ? ` min="${f.min}" max="${f.max}" step="${f.step || 1}" inputmode="${f.step ? 'decimal' : 'numeric'}"`
         : ` maxlength="${f.max}"`;
     return `<div class="field"><label for="${id}">${esc(f.label)}${req}</label><input id="${id}" type="${f.type}" data-pf="${f.k}" value="${esc(v)}"${extra} placeholder="${esc(f.ph || '')}"></div>`;
-  }).join('');
+  }
 }
 // Lit le formulaire ; renvoie {profile, settings, errors}
 function readProfileForm(root) {
@@ -104,6 +164,9 @@ function readProfileForm(root) {
     if (f.set) s[f.k] = v;
     else p[f.k] = v;
   });
+  // cases sans objet : on ne garde pas de réponse cachée
+  if (p.sexe !== 'F') Object.assign(p, {allaitement: false, grossesse: false});
+  if (!p.allaitement) Object.assign(p, {bebeAge: '', allaitementType: ''});
   if (p.age !== '' && p.age < 18) errors.push('Âge : OliWeight est réservé aux adultes (18 ans et plus)');
   if (s.targetWeight !== '' && s.startWeight !== '' && s.targetWeight >= s.startWeight)
     errors.push('Poids visé : il doit être plus bas que le poids actuel');
@@ -200,7 +263,7 @@ function profileSummary() {
   const lab = (f, v) => (f.opts?.find((o) => o[0] === v) || [, v])[1];
   const F = Object.fromEntries(PROFILE_FIELDS.map((f) => [f.k, f]));
   return [
-    `PROFIL : ${p.prenom || '—'}, ${p.age || '?'} ans, ${p.taille || '?'} cm · activité ${lab(F.activite, p.activite) || '—'} · allaitement ${p.allaitement ? 'oui' : 'non'}${p.grossesse ? ' · ENCEINTE' : ''}`,
+    `PROFIL : ${p.prenom || '—'}, ${p.sexe === 'H' ? 'homme' : p.sexe === 'F' ? 'femme' : '?'}, ${p.age || '?'} ans, ${p.taille || '?'} cm · ${defaultMealCount()} repas/jour · budget ${kcalTarget() ? fmtK(kcalTarget()) + ' kcal (calculé)' : 'manuel'} · activité ${lab(F.activite, p.activite) || '—'} · allaitement ${p.allaitement ? 'oui' : 'non'}${p.grossesse ? ' · ENCEINTE' : ''}`,
     `   santé : ${(p.sante || []).map((x) => lab(F.sante, x)).join(', ') || 'rien de signalé'}${p.medicaments ? ' · médicaments : ' + p.medicaments : ''}${p.allergies ? ' · allergies : ' + p.allergies : ''}`,
     `   aime : ${p.aimes || '—'} · refuse : ${p.refuses || '—'} · budget ${lab(F.budget, p.budget) || '—'} · temps ${lab(F.temps, p.temps) || '—'} · foyer ${p.foyer || '?'}${p.deuxJours ? ' · cuisine pour 2 jours' : ''}`,
     '',

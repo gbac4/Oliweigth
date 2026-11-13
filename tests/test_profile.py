@@ -13,6 +13,7 @@ def fill_onboarding(page, age="32"):
     page.fill("#ob-age", age)
     page.fill("#ob-startWeight", "90")
     page.fill("#ob-targetWeight", "75")
+    page.select_option("#ob-sexe", "F")
     page.select_option("#ob-allaitement", "non")
     page.click("#obSave")
 
@@ -43,7 +44,7 @@ def test_onboarding_refuses_minor(page):
 def test_existing_user_gets_partial_profile_and_banner(page):
     load_state(page, fixture("backup-v2.0.3.json"))
     d = state(page)
-    assert d["profile"] == {"allaitement": True, "done": False}
+    assert d["profile"] == {"allaitement": True, "done": False, "sexe": "F", "bebeAge": "0-6", "allaitementType": "exclusif"}
     assert not page.is_visible("#onboarding")
     assert "Complète ton profil" in page.text_content("#banners")
 
@@ -59,4 +60,4 @@ def test_profile_edit_in_settings_and_summary(page):
     assert d["profile"]["sante"] == ["anemie"] and d["profile"]["done"] is True
     assert float(d["settings"]["startWeight"]) == 100.0  # inchangé
     assert "médecin" in page.text_content("#profileWarn")
-    assert "PROFIL : Test, 30 ans" in page.evaluate("summaryText()")
+    assert "PROFIL : Test, femme, 30 ans" in page.evaluate("summaryText()")

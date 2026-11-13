@@ -178,6 +178,22 @@ const PATCHES = [
     },
   },
   {
+    // fiche #21 : l'allaitement n'est plus supposé ; on garde la situation de l'utilisatrice d'origine
+    id: 'sexe-allaitement-1',
+    run: (d) => {
+      const p = d.profile,
+        feeds = Object.values(d.logs || {}).some((l) => num(l.feedsDay) + num(l.feedsNight) > 0);
+      if (!p || p.sexe) return;
+      if (p.allaitement === true || (p.allaitement !== false && feeds))
+        Object.assign(p, {
+          sexe: 'F',
+          allaitement: true,
+          bebeAge: p.bebeAge || '0-6',
+          allaitementType: p.allaitementType || 'exclusif',
+        });
+    },
+  },
+  {
     id: 'v23-options',
     run: (d) => {
       Object.entries(NEW_MEALS).forEach(([k, v]) => {

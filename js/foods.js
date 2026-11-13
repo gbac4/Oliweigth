@@ -82,11 +82,10 @@ const FOODS = Object.fromEntries(
 );
 // Accompagnements proposés dans le calculateur de portion
 const SIDES = ['taro', 'manioc', 'plantain', 'riz', 'baton-manioc', 'couscous-mais', 'pomme-de-terre'];
-// Part du budget calorique de la journée par moment (petit-déj, collation, dîner, collation, souper)
-const SLOT_SHARE = {P: 0.25, C: 0.075, D: 0.3, S: 0.3};
+// Budget du jour (personnalisé si possible) et part du moment selon le nombre de repas (energy.js)
 function dayTarget() {
-  return Math.round((kcalMin() + kcalLimit()) / 2);
+  return kcalTarget() ?? Math.round((kcalMin() + kcalLimit()) / 2);
 }
 function slotBudget(slot) {
-  return Math.round(dayTarget() * (SLOT_SHARE[slot] || 0.3));
+  return Math.round(dayTarget() * slotShare(slot));
 }

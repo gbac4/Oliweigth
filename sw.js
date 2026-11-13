@@ -1,6 +1,6 @@
 // OliWeight — service worker
 // Change VERSION à chaque mise en ligne : les téléphones récupèrent alors la nouvelle version.
-const VERSION = 'oliweight-v3.3.0';
+const VERSION = 'oliweight-v3.4.0';
 const CORE = [
   './',
   './index.html',
@@ -13,6 +13,7 @@ const CORE = [
   './js/util.js',
   './js/store.js',
   './js/rules.js',
+  './js/energy.js',
   './js/kcal.js',
   './js/weights.js',
   './js/photos.js',

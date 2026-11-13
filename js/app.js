@@ -228,7 +228,7 @@ $('extraAdd').addEventListener('click', () => {
 });
 $('allDone').addEventListener('click', () => {
   const l = logFor(selectedDate);
-  planFor(selectedDate).forEach((_, i) => {
+  activeSlots(selectedDate).forEach((i) => {
     if (!l.meals[i]?.status) l.meals[i] = {status: 'done', reasons: [], replacement: ''};
   });
   save();

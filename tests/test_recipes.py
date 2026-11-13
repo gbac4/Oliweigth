@@ -8,6 +8,7 @@ def new_user(page, **extra):
     page.wait_for_timeout(300)
     page.fill("#ob-prenom", "Test")
     page.fill("#ob-age", "35")
+    page.select_option("#ob-sexe", "F")
     page.fill("#ob-startWeight", "90")
     for k, v in extra.items():
         page.fill(f"#ob-{k}", v)

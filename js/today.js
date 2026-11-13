@@ -55,7 +55,7 @@ function renderRing() {
     [x2, y2] = ang(Math.min(minFrac, 1));
   $('kcalRing').innerHTML =
     `<div class="ring-wrap"><svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="${R}" fill="none" stroke="var(--surface2)" stroke-width="16"/><circle cx="100" cy="100" r="${R}" fill="none" stroke="${over ? 'var(--warn)' : 'var(--brand)'}" stroke-width="16" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - frac)}" style="transition:stroke-dashoffset .6s ease"/>${minFrac < 1 ? `<line x1="${100 + (R - 12) * Math.cos(minFrac * 2 * Math.PI)}" y1="${100 + (R - 12) * Math.sin(minFrac * 2 * Math.PI)}" x2="${100 + (R + 12) * Math.cos(minFrac * 2 * Math.PI)}" y2="${100 + (R + 12) * Math.sin(minFrac * 2 * Math.PI)}" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round"/>` : ''}</svg><div class="ring-center"><strong>${fmtK(k)}</strong><span>/ ${fmtK(lim)} kcal</span><span>mangées</span></div></div>
- <div class="ring-side"><div class="ring-state" style="color:${cls}">${esc(state)}</div><div class="row wrap" style="gap:6px"><span class="chip">${mealsDone(data.logs[d] || {})}/5 repas</span><span class="chip">${fr(num(data.logs[d]?.water) / 1000)} L d’eau</span></div>
+ <div class="ring-side"><div class="ring-state" style="color:${cls}">${esc(state)}</div><div class="row wrap" style="gap:6px"><span class="chip">${mealsDone(data.logs[d] || {})}/${activeSlots(d).length} repas</span><span class="chip">${fr(num(data.logs[d]?.water) / 1000)} L d’eau</span></div>
  <div class="small muted">Minimum ${fmtK(kcalMin())} · prévu ≈ ${fmtK(plan)}</div>${unknown ? `<div class="small muted" style="margin-top:6px">${unknown} repas remplacé${unknown > 1 ? 's' : ''} sans calories : ajoute une estimation pour un total juste.</div>` : ''}</div>`;
   $('kcalRing').setAttribute('aria-label', `${fmtK(k)} calories mangées sur une limite de ${fmtK(lim)}. ${state}`);
 }
@@ -90,10 +90,15 @@ function renderToday() {
   renderExtras();
   const slots = effCodes(selectedDate),
     base = planFor(selectedDate),
-    nextIdx = selectedDate === t ? slots.findIndex((_, i) => !l.meals[i]?.status) : -1;
+    act = activeSlots(selectedDate),
+    pf = portionFactor(selectedDate),
+    nextIdx = selectedDate === t ? slots.findIndex((_, i) => act.includes(i) && !l.meals[i]?.status) : -1,
+    nb = mealCount(selectedDate);
   $('todayMeals').innerHTML =
+    `<div class="mealcount" role="group" aria-label="Nombre de repas ce jour-là"><span class="small muted">Repas ce jour-là :</span>${[3, 4, 5].map((n) => `<button type="button" data-mealcount="${n}" class="${n === nb ? 'active' : ''}" aria-pressed="${n === nb}">${n}</button>`).join('')}${pf !== 1 ? `<span class="small muted">portions ×${fr(pf, 2)}</span>` : ''}</div>` +
     slots
       .map((code, i) => {
+        if (!act.includes(i)) return '';
         const m = data.meals[code] || {nom: code, details: ''},
           v = l.meals[i] || {};
         const opts = [
@@ -106,7 +111,7 @@ function renderToday() {
         const [slotName, slotTime] = SLOTS[i].split(' · '),
           isNext = i === nextIdx,
           open = openMeals.has(i);
-        return `<article class="tl-item meal-card st-${v.status || 'todo'} ${isNext ? 'is-next' : ''}" data-meal="${i}"><div class="tl-time">${esc(slotTime || '')}</div><div class="tl-rail" aria-hidden="true"></div><div class="tl-card"><div class="tl-head"><button type="button" class="tl-check ${v.status === 'done' ? 'on' : ''}" data-quick="done" aria-pressed="${v.status === 'done'}" aria-label="${v.status === 'done' ? 'Annuler : ' : 'Marquer comme respecté : '}${esc(m.nom)}">${v.status === 'done' ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>' : ''}</button><button type="button" class="tl-open" data-open aria-expanded="${open}"><span class="tl-slot"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(slotName)} · ${fmtK(mealKcal(code, v))} kcal</span><span class="tl-tag">${esc(v.status ? STATUS_LABEL[v.status] : isNext ? 'Maintenant' : '')}</span></span><span class="tl-name">${esc(m.nom)}</span></button></div><div class="tl-body ${open ? '' : 'hidden'}">${photoBlock(m)}<div class="meal-detail">${esc(m.details)}</div>${ingredientBlock(code, m, i, base[i])}${opts.length > 1 ? `<div class="field" style="margin-top:-4px"><label class="small muted">Changer pour un plat équivalent (calories proches)</label><select data-alt>${opts.map((c) => `<option value="${esc(c)}" ${c === code ? 'selected' : ''}>${c === base[i] ? 'Prévu : ' : ''}${esc(data.meals[c].nom)} · ≈ ${fmtK(kcalOf(c))} kcal</option>`).join('')}</select></div>` : ''}<div class="statuses">${[
+        return `<article class="tl-item meal-card st-${v.status || 'todo'} ${isNext ? 'is-next' : ''}" data-meal="${i}"><div class="tl-time">${esc(slotTime || '')}</div><div class="tl-rail" aria-hidden="true"></div><div class="tl-card"><div class="tl-head"><button type="button" class="tl-check ${v.status === 'done' ? 'on' : ''}" data-quick="done" aria-pressed="${v.status === 'done'}" aria-label="${v.status === 'done' ? 'Annuler : ' : 'Marquer comme respecté : '}${esc(m.nom)}">${v.status === 'done' ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>' : ''}</button><button type="button" class="tl-open" data-open aria-expanded="${open}"><span class="tl-slot"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(slotName)} · ${fmtK(mealKcal(code, v, selectedDate, i))} kcal</span><span class="tl-tag">${esc(v.status ? STATUS_LABEL[v.status] : isNext ? 'Maintenant' : '')}</span></span><span class="tl-name">${esc(m.nom)}</span></button></div><div class="tl-body ${open ? '' : 'hidden'}">${photoBlock(m)}${pf !== 1 ? `<div class="alert info small">Portion ×${fr(pf, 2)} : ${pf > 1 ? 'un peu plus' : 'un peu moins'} que les quantités écrites, pour garder ${fmtK(dayGoal(selectedDate))} kcal sur la journée.</div>` : ''}<div class="meal-detail">${esc(m.details)}</div>${ingredientBlock(code, m, i, base[i])}${opts.length > 1 ? `<div class="field" style="margin-top:-4px"><label class="small muted">Changer pour un plat équivalent (calories proches)</label><select data-alt>${opts.map((c) => `<option value="${esc(c)}" ${c === code ? 'selected' : ''}>${c === base[i] ? 'Prévu : ' : ''}${esc(data.meals[c].nom)} · ≈ ${fmtK(kcalOf(c))} kcal</option>`).join('')}</select></div>` : ''}<div class="statuses">${[
           ['done', '✅ Fait'],
           ['partial', '🟡 Partiel'],
           ['replaced', '🔄 Remplacé'],

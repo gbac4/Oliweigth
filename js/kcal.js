@@ -17,16 +17,18 @@ function effCode(date, i) {
 function effCodes(date) {
   return planFor(date).map((_, i) => effCode(date, i));
 }
+// Repas gardés du jour, portions mises à l'échelle (fiche #21)
 function dayKcal(date, onlyDone) {
   const l = data.logs[date];
-  return effCodes(date).reduce((t, c, i) => {
+  return activeSlots(date).reduce((t, i) => {
     const st = l?.meals?.[i]?.status;
     if (onlyDone && !(st === 'done' || st === 'partial')) return t;
-    return t + kcalOf(c);
+    return t + slotKcal(date, i);
   }, 0);
 }
+// Budget personnalisé s'il est calculable, sinon la limite manuelle des réglages
 function kcalLimit() {
-  return Math.max(kcalMin(), num(data.settings.kcalMax, KCAL_MAX));
+  return kcalTarget() ?? Math.max(kcalMin(), num(data.settings.kcalMax, KCAL_MAX));
 }
 // mangées : fait ou partiel = la portion prévue ; remplacé = l'estimation saisie ; sauté = 0
 function addsKcal(m) {
@@ -44,7 +46,7 @@ function eatenKcal(date) {
     const m = l.meals?.[i];
     if (m && m.status !== 'skipped') k += addsKcal(m);
     if (!m?.status) return;
-    if (m.status === 'done' || m.status === 'partial') k += kcalOf(c) + swapDelta(m);
+    if (m.status === 'done' || m.status === 'partial') k += slotKcal(date, i, c) + swapDelta(m);
     else if (m.status === 'replaced') {
       if (num(m.kcal) > 0) k += num(m.kcal);
       else unknown++;
@@ -56,5 +58,5 @@ function mealsDone(l) {
   return Object.values(l?.meals || {}).filter((m) => m.status === 'done').length;
 }
 function isComplete(l, date) {
-  return planFor(date).every((_, i) => l?.meals?.[i]?.status);
+  return activeSlots(date).every((i) => l?.meals?.[i]?.status);
 }
