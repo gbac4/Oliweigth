@@ -2,6 +2,10 @@
 
 Format : une entrée par version publiée sur GitHub Pages. La version s'affiche dans Réglages, tout en bas.
 
+## 3.3.0 — 2026-11-13
+- Créer ma recette (#19) : dans Menus › Recettes, on entre les ingrédients comme on les met dans la marmite (en grammes ou en unités pratiques : paquet, boîte, c. à soupe…), avec la valeur d'étiquette si on l'a, puis le poids de la marmite cuite ou le nombre de parts. Table d'ingrédients pour 100 g (Santé Canada, FAO), y compris feuilles de manioc, crème de palme, hareng fumé, écrevisses. La recette va dans la banque et se synchronise.
+- Calculateur de portion : la recette ne change pas, la portion s'adapte au budget du moment (petit-déjeuner 25 %, dîner et souper 30 %, collation 7,5 %). Deux options avec l'accompagnement choisi : riche en sauce ou riche en féculent, en grammes, en tasses et en fraction de marmite. Modèle « kpwem standard » prêt à ajuster.
+
 ## 3.2.0 — 2026-11-13
 - Ingrédient absent (#17) : toucher un ingrédient → « Sans » (ses calories sont retirées) ou « Remplacé par… » (équivalent de la même famille, différence de calories). L'anneau, le repas, le résumé et l'analyse utilisent le total ajusté ; l'ingrédient part dans les Manquants. Changer de plat entier devient une option repliée.
 

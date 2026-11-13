@@ -69,9 +69,12 @@ function recipeMeta(code, m) {
   return {code, moment: mom, cuisine, temps, budget, tags, kcal: kcalOf(code, m), text: all};
 }
 // Une entrée par nom de plat ; la dernière version (portions révisées du cycle) l'emporte.
-let RECIPE_CACHE = null;
+let RECIPE_CACHE = null,
+  RECIPE_KEY = '';
 function recipeBank() {
-  if (RECIPE_CACHE) return RECIPE_CACHE;
+  const key = typeof data !== 'undefined' && data ? JSON.stringify(data.customRecipes || {}) : '';
+  if (RECIPE_CACHE && RECIPE_KEY === key) return RECIPE_CACHE;
+  RECIPE_KEY = key;
   const byName = new Map();
   const add = (code, m) => {
     if (!m || !m.nom) return;
@@ -79,6 +82,9 @@ function recipeBank() {
   };
   Object.entries(DEFAULT_MEALS).forEach(([k, m]) => add(k, m));
   DEFAULT_CYCLE.weeks.forEach((w) => Object.entries(w.meals || {}).forEach(([k, m]) => add(k, m)));
+  // recettes créées par la personne (fiche #19)
+  if (typeof data !== 'undefined' && data && data.customRecipes)
+    Object.entries(data.customRecipes).forEach(([k, r]) => add(k, customAsMeal(k, r)));
   RECIPE_CACHE = [...byName.values()].sort((a, b) => a.nom.localeCompare(b.nom, 'fr'));
   return RECIPE_CACHE;
 }
@@ -219,6 +225,13 @@ function renderRecipes() {
     <div class="row wrap">${selectHTML('rf-moment', 'Moment', MOMENTS, f.moment)}${selectHTML('rf-cuisine', 'Cuisine', CUISINES, f.cuisine)}</div>
     <div class="row wrap">${selectHTML('rf-budget', 'Budget', BUDGETS, f.budget)}${selectHTML('rf-temps', 'Préparation', TEMPS, f.temps)}</div>
     <label class="small"><input type="checkbox" id="rf-compat" data-rf="compat" ${f.compat ? 'checked' : ''}> Seulement les recettes compatibles avec mon profil</label>`;
+  if (!$('creator'))
+    $('recipeFilters')
+      .closest('.card')
+      .insertAdjacentHTML(
+        'afterend',
+        '<div class="row wrap"><button class="primary grow" id="crNew">+ Créer ma recette</button></div><div id="creator"></div>',
+      );
   const list = filteredRecipes();
   $('recipeCount').textContent = `${list.length} recette${list.length > 1 ? 's' : ''}`;
   $('recipeList').innerHTML =
@@ -229,7 +242,7 @@ function renderRecipes() {
         ) => `<details class="day-panel"><summary>${esc(r.nom)} <span class="muted small">· ≈ ${fmtK(r.kcal)} kcal</span></summary><div class="day-content">
         <div class="row wrap" style="gap:6px;margin-bottom:6px"><span class="pill">${esc(MOMENTS[r.moment])}</span><span class="pill">${esc(CUISINES[r.cuisine])}</span><span class="pill">${esc(BUDGETS[r.budget])}</span><span class="pill">${esc(TEMPS[r.temps])}</span></div>
         ${r.tags.length ? `<div class="small muted">Contient / repère : ${esc(r.tags.map((t) => TAGS[t][1]).join(', '))}</div>` : ''}
-        ${photoBlock(r)}<div class="meal-detail">${esc(r.details || '')}</div></div></details>`,
+        ${photoBlock(r)}<div class="meal-detail">${esc(r.details || '')}</div>${r.custom ? portionCalcHTML(r.code) : ''}</div></details>`,
       )
       .join('') || '<div class="empty">Aucune recette ne correspond à ces filtres.</div>';
 }
