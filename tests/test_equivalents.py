@@ -1,5 +1,5 @@
 """Fiche #4 : changer un repas pour un plat équivalent."""
-from conftest import fixture, load_state, state
+from conftest import fixture, load_state, state, open_meal
 
 
 def test_equivalents_same_moment_close_kcal(page):
@@ -21,7 +21,7 @@ def test_equivalents_respect_profile(page):
 
 def test_switch_updates_shopping_list(page):
     load_state(page, fixture("backup-v2.0.3.json"))
-    sel = page.locator(".meal-card").nth(4).locator("select[data-alt]")
+    sel = open_meal(page, 4).locator("select[data-alt]")
     alt = sel.locator("option").nth(1).get_attribute("value")
     sel.select_option(alt)
     d = state(page)
@@ -32,5 +32,5 @@ def test_switch_updates_shopping_list(page):
 
 def test_pinned_flourish_still_offered_for_breakfast(page):
     load_state(page, fixture("backup-v2.0.3.json"))
-    vals = page.locator(".meal-card").nth(0).locator("select[data-alt] option").evaluate_all("o=>o.map(x=>x.value)")
+    vals = open_meal(page, 0).locator("select[data-alt] option").evaluate_all("o=>o.map(x=>x.value)")
     assert "P6" in vals and len(vals) == len(set(vals))

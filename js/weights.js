@@ -102,14 +102,14 @@ function renderGoal() {
     $('goal').innerHTML = '<div class="empty">Indique le poids cible dans Réglages.</div>';
     return;
   }
+  $('goalTarget').textContent = `objectif ${fr(g.target)} kg`;
   $('goal').innerHTML =
-    `<div class="metric-grid"><div class="metric"><strong>${fr(g.cur)} kg</strong><span>Poids actuel</span></div><div class="metric"><strong>${fr(g.target)} kg</strong><span>Poids cible</span></div><div class="metric"><strong>${g.lost >= 0 ? '−' : '+'}${fr(Math.abs(g.lost))} kg</strong><span>Depuis le départ</span></div><div class="metric"><strong>${fr(g.left)} kg</strong><span>Reste à perdre</span></div></div>
- <div class="row between" style="margin-top:12px"><b>${fr(g.pct, 0)} % du chemin</b><span class="small muted">${fr(g.start)} → ${fr(g.target)} kg</span></div><div class="bar" style="margin:8px 0 14px"><i style="width:${g.pct}%"></i></div>
- <h3>Date probable</h3>
+    `<div class="row between" style="margin-top:8px"><b>${fr(g.pct, 0)} % du chemin</b><span class="small muted">${fr(g.start)} → ${fr(g.target)} kg</span></div><div class="bar" style="margin:8px 0 14px"><i style="width:${g.pct}%"></i></div>
+ <details class="fold"><summary>Dates probables et étapes</summary><h3 style="margin-top:10px">Date probable</h3>
  <div class="row between" style="margin:6px 0"><span>Au rythme prévu (${fr(g.rate)} kg/sem.)</span><b>${g.planDate ? esc(fmtMonth(g.planDate)) : '—'}</b></div>
  <div class="row between" style="margin:6px 0"><span>À ton rythme réel${g.real !== null ? ` (${fr(g.real, 2)} kg/sem.)` : ''}</span><b>${g.realDate ? esc(fmtMonth(g.realDate)) : '—'}</b></div>
  <div class="small muted">${g.real === null ? 'Le rythme réel s’affiche après 3 pesées sur au moins 2 semaines.' : g.real > 1 ? '⚠️ Rythme réel trop rapide pour l’allaitement : on remonte les portions.' : g.real < 0.1 ? 'Le poids est stable pour l’instant : on ajustera les menus.' : ''} C’est une estimation : la perte ralentit souvent avec le temps, et le rythme sera revu avec le médecin après le sevrage.</div>
- <h3 style="margin-top:14px">Étapes</h3>${g.marks.map((m) => `<div class="row between" style="margin:6px 0"><span>${m.date ? '✅' : '⬜'} ${esc(m.label)} · ${fr(m.kg)} kg</span><span class="small muted">${m.date ? esc(fmtDate(m.date, {day: 'numeric', month: 'short'})) : ''}</span></div>`).join('')}`;
+ <h3 style="margin-top:14px">Étapes</h3>${g.marks.map((m) => `<div class="row between" style="margin:6px 0"><span>${m.date ? '✅' : '⬜'} ${esc(m.label)} · ${fr(m.kg)} kg</span><span class="small muted">${m.date ? esc(fmtDate(m.date, {day: 'numeric', month: 'short'})) : ''}</span></div>`).join('')}</details>`;
 }
 function drawChart() {
   const c = $('weightChart'),

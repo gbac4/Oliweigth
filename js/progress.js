@@ -64,6 +64,41 @@ function weekStats() {
 function renderProgress() {
   const st = weekStats(),
     {logs} = st;
+  const g = goalStats(),
+    kp = (label, value, note, cls = '') =>
+      `<div class="kpi"><span>${esc(label)}</span><strong>${esc(value)}</strong><span class="kpi-note ${cls}">${esc(note)}</span></div>`,
+    hasW = g.n > 0,
+    rate = g.real;
+  $('progressKpis').innerHTML = [
+    kp(
+      'Poids actuel',
+      hasW || g.cur ? `${fr(g.cur)} kg` : '—',
+      g.cur ? `${g.lost >= 0 ? '−' : '+'}${fr(Math.abs(g.lost))} kg depuis le départ` : 'ajoute une pesée',
+      g.lost > 0 ? 'good' : '',
+    ),
+    kp(
+      'Rythme',
+      rate !== null ? `${fr(rate, 2)} kg/sem.` : `${fr(g.rate)} kg/sem.`,
+      rate === null
+        ? 'prévu (réel après 3 pesées)'
+        : rate > 1
+          ? 'trop rapide'
+          : rate >= 0.1
+            ? 'dans la cible'
+            : 'poids stable',
+      rate !== null && rate > 1 ? 'bad' : rate !== null && rate >= 0.1 ? 'good' : '',
+    ),
+    kp(
+      'Jours complets',
+      `${st.complete} / 7`,
+      st.streak > 1 ? `série de ${st.streak} jours` : `${st.tracked}/35 repas notés`,
+    ),
+    kp(
+      'Date probable',
+      isPaused() ? 'en pause' : g.realDate ? fmtMonth(g.realDate) : g.planDate ? fmtMonth(g.planDate) : '—',
+      g.realDate ? 'à ton rythme réel' : 'au rythme prévu',
+    ),
+  ].join('');
   $('weekMetrics').innerHTML =
     `<div class="metric"><strong>${st.tracked ? Math.round((st.done / st.tracked) * 100) : 0} %</strong><span>Repas respectés</span></div><div class="metric"><strong>${st.complete}/7</strong><span>Jours complets</span></div><div class="metric"><strong>${st.streak}</strong><span>Jours complets d’affilée</span></div><div class="metric"><strong>${st.tracked}/35</strong><span>Repas notés</span></div>`;
   $('slotAdherence').innerHTML = st.slot

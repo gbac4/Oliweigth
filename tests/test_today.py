@@ -1,5 +1,5 @@
 """Écran Aujourd'hui : statuts, calories, options, extras, ajouts rapides."""
-from conftest import fixture, load_state, state
+from conftest import fixture, load_state, state, open_meal
 
 
 def ring_kcal(page):
@@ -9,26 +9,27 @@ def ring_kcal(page):
 def test_status_updates_ring(page):
     load_state(page, fixture("backup-v2.0.3.json"))
     assert ring_kcal(page) == 0
-    page.locator(".meal-card").nth(0).locator("[data-status=done]").click()
+    open_meal(page, 0).locator("[data-status=done]").click()
     assert ring_kcal(page) == 570  # P1
-    page.locator(".meal-card").nth(0).locator("[data-status=done]").click()  # re-clic = annule
+    open_meal(page, 0).locator("[data-status=done]").click()  # re-clic = annule
     assert ring_kcal(page) == 0
 
 
 def test_alternative_option_changes_calories(page):
     load_state(page, fixture("backup-v2.0.3.json"))
-    sel = page.locator(".meal-card").nth(0).locator("select[data-alt]")
+    sel = open_meal(page, 0).locator("select[data-alt]")
     alt = sel.locator("option").nth(1).get_attribute("value")
     sel.select_option(alt)
-    page.locator(".meal-card").nth(0).locator("[data-status=done]").click()
+    open_meal(page, 0).locator("[data-status=done]").click()
     assert ring_kcal(page) == page.evaluate(f"kcalOf('{alt}')")
     assert state(page)["logs"]["2026-11-12"]["alt"]["0"] == alt
 
 
 def test_quick_adds_and_extras(page):
     load_state(page, fixture("backup-v2.0.3.json"))
-    page.locator(".meal-card").nth(0).locator("[data-status=done]").click()
-    page.locator(".meal-card").nth(0).locator('[data-add="0"]').click()  # huile +120
+    open_meal(page, 0).locator("[data-status=done]").click()
+    open_meal(page, 0).locator('[data-add="0"]').click()  # huile +120
+    page.click('[data-jump=extrasSec]')
     page.click('#extraChips [data-extra="0"]')  # beignet +200
     page.fill("#extraName", "Bonbon")
     page.fill("#extraKcal", "25")
@@ -40,7 +41,7 @@ def test_quick_adds_and_extras(page):
 
 def test_replaced_meal_with_estimate(page):
     load_state(page, fixture("backup-v2.0.3.json"))
-    card = page.locator(".meal-card").nth(2)
+    card = open_meal(page, 2)
     card.locator("[data-status=replaced]").click()
     card.locator("[data-replacement]").fill("riz sauce")
     card.locator("[data-repl-kcal]").fill("600")

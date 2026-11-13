@@ -2,6 +2,10 @@
 
 Format : une entrée par version publiée sur GitHub Pages. La version s'affiche dans Réglages, tout en bas.
 
+## 3.0.0 — 2026-11-12
+- Nouvelle interface « Aujourd'hui » (propositions A + B) : anneau des calories compact, boutons rapides (+ Eau, + Extra, + Tétée), repas en fil horaire avec coche d'un geste, prochain repas mis en avant, détails dépliables, « Cuisine fermée » à 21 h ; extras, eau, allaitement et humeur repliés.
+- Nouveau tableau « Progrès » (proposition C) : 4 indicateurs (poids, rythme, jours complets, date probable), poids avec légende, calories, repas respectés en cases, détails repliés.
+
 ## 2.11.0 — 2026-11-12
 - Règles selon la situation (#5) : fin d'allaitement (carte Tétées et alerte masquées, plancher 1 500 kcal, perte max 1 % du poids/semaine) ; grossesse ou maladie : mode pause sans déficit.
 - Exclusions santé dans la banque et les équivalents : hypertension et reins (sel), diabète (sucres ajoutés), maladie cœliaque (gluten) ; anémie : plats riches en fer favorisés.
