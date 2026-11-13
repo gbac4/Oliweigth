@@ -176,6 +176,42 @@ function generateCycle(p, startMonday, nWeeks = 5) {
   }
   return weeks;
 }
+// Fiche #23 : refaire les menus à partir du lundi suivant (semaine en cours et courses inchangées).
+// Seulement pour des menus créés depuis la banque : un cycle publié (menus/cycle.json) n'est pas écrasé.
+function canRegenerateMenus() {
+  return data.meta?.menusFrom === 'banque';
+}
+function regenerateFromNextWeek() {
+  if (!canRegenerateMenus()) return false;
+  const start = shiftDate(weekStartOf(todayISO()), 7),
+    weeks = generateCycle(data.profile, start);
+  recipeBank().forEach((r) => {
+    if (!data.meals[r.code]) data.meals[r.code] = {nom: r.nom, details: r.details, ing: r.ing || [], kcal: r.kcal};
+  });
+  data.weeks = weeks.map((w, i) => ({
+    ...w,
+    label: `Menus semaine ${i + 2} (refaits)`,
+    meals: {},
+    basePlan: w.plan,
+    swaps: [],
+  }));
+  data.meta.menusReviewedAt = new Date().toISOString();
+  save();
+  return true;
+}
+function regenButtonHTML() {
+  return canRegenerateMenus()
+    ? `<button type="button" data-regen style="margin-top:8px;width:100%">🔄 Refaire mes menus à partir de lundi prochain</button>`
+    : '';
+}
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('[data-regen]')) return;
+  if (!confirm('Refaire les menus à partir de lundi prochain ? La semaine en cours ne change pas.')) return;
+  if (regenerateFromNextWeek()) {
+    renderAll();
+    toast('Nouveaux menus prêts à partir de lundi prochain.');
+  }
+});
 function proposeMenusFromBank() {
   const p = data.profile,
     start = weekStartOf(todayISO()),

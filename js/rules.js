@@ -50,7 +50,9 @@ function ruleBanners() {
     );
   if (menusToReview())
     b.push(
-      '<div class="alert">📝 Profil modifié : les menus des prochaines semaines vont être révisés. En attendant, utilise « Changer pour un plat équivalent » si un plat ne te convient plus.</div>',
+      canRegenerateMenus()
+        ? `<div class="alert">📝 Profil modifié : tes menus peuvent être refaits selon tes nouvelles réponses.${regenButtonHTML()}</div>`
+        : '<div class="alert">📝 Profil modifié : les menus des prochaines semaines vont être révisés. En attendant, utilise « Changer pour un plat équivalent » si un plat ne te convient plus.</div>',
     );
   return b;
 }
