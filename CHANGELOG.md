@@ -2,6 +2,13 @@
 
 Format : une entrée par version publiée sur GitHub Pages. La version s'affiche dans Réglages, tout en bas.
 
+## 3.4.0 — 2026-11-13
+- Calories personnalisées (#21), calculées dans le téléphone sans IA : Mifflin-St Jeor (poids de la dernière pesée, taille, âge, sexe) × activité + allaitement (+330 kcal de 0 à 6 mois, +400 ensuite, moitié si partiel) − déficit pour la perte visée (plafonné à 25 % et à 500 kcal en allaitement), jamais sous le minimum. Le détail du calcul s'affiche dans Réglages.
+- Ajustement selon la balance : après au moins 3 semaines de pesées (hors 2 premières semaines), l'app compare la perte réelle à la perte visée et propose −100 kcal (trop lent) ou +150 kcal (trop rapide). La personne accepte ou non ; prochaine vérification 3 semaines plus tard.
+- Nombre de repas : 3, 4 ou 5 au profil, et changement pour un seul jour dans « Ma journée ». Le total du jour est conservé : les portions des repas gardés sont mises à l'échelle (×0,6 à ×1,6).
+- Profil : sexe, âge du bébé, allaitement exclusif ou partiel, repas par jour. Les questions d'allaitement et de grossesse n'apparaissent que pour une femme.
+- Correction : sans réponse, l'app ne suppose plus que la personne allaite (le minimum passait à 1 800 kcal pour tout le monde).
+
 ## 3.3.0 — 2026-11-13
 - Créer ma recette (#19) : dans Menus › Recettes, on entre les ingrédients comme on les met dans la marmite (en grammes ou en unités pratiques : paquet, boîte, c. à soupe…), avec la valeur d'étiquette si on l'a, puis le poids de la marmite cuite ou le nombre de parts. Table d'ingrédients pour 100 g (Santé Canada, FAO), y compris feuilles de manioc, crème de palme, hareng fumé, écrevisses. La recette va dans la banque et se synchronise.
 - Calculateur de portion : la recette ne change pas, la portion s'adapte au budget du moment (petit-déjeuner 25 %, dîner et souper 30 %, collation 7,5 %). Deux options avec l'accompagnement choisi : riche en sauce ou riche en féculent, en grammes, en tasses et en fraction de marmite. Modèle « kpwem standard » prêt à ajuster.

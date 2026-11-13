@@ -69,6 +69,8 @@ function renderProgress() {
       `<div class="kpi"><span>${esc(label)}</span><strong>${esc(value)}</strong><span class="kpi-note ${cls}">${esc(note)}</span></div>`,
     hasW = g.n > 0,
     rate = g.real;
+  if (!$('kcalSuggest')) $('progressKpis').insertAdjacentHTML('beforebegin', '<div id="kcalSuggest"></div>');
+  $('kcalSuggest').innerHTML = suggestionCard();
   $('progressKpis').innerHTML = [
     kp(
       'Poids actuel',
