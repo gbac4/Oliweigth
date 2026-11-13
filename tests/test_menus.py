@@ -9,7 +9,7 @@ def test_week_chips_and_shopping(page):
     assert "Cette semaine" in chips and "16 nov" in chips
     page.click('#weekChips [data-week="2026-11-16"]')
     page.click("[data-menutab=shop]")
-    assert int(page.text_content("#shopCount").split("/")[1]) > 20
+    assert int(page.text_content("#shopCount").split()[0]) > 20
 
 
 def test_bloc_swap_is_kept(page):

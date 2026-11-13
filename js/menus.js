@@ -251,41 +251,5 @@ function shopChecked() {
   if (!data.shopByWeek[st]) data.shopByWeek[st] = {};
   return data.shopByWeek[st];
 }
-function renderShop() {
-  const items = shoppingItems(),
-    checked = shopChecked(),
-    st = vStart();
-  $('shopInfo').textContent =
-    `Semaine du ${fmtDate(st, {day: 'numeric', month: 'long'})}. Coche au fur et à mesure. Les plats sont cuisinés pour 2 jours.`;
-  $('shopCount').textContent = `${items.filter((i) => checked[i.name.toLowerCase()]).length}/${items.length}`;
-  $('shopList').innerHTML =
-    Object.entries(CATS)
-      .map(([c, label]) => {
-        const list = items.filter((i) => i.cat === c);
-        if (!list.length) return '';
-        return (
-          `<div class="shop-cat">${esc(label)}</div>` +
-          list
-            .map((i) => {
-              const k = i.name.toLowerCase(),
-                on = !!checked[k];
-              return `<label class="shop-item ${on ? 'done' : ''}"><input type="checkbox" data-shop="${esc(k)}" ${on ? 'checked' : ''}><span>${esc(i.name)}</span><small>${esc([...i.codes].join(' '))}</small></label>`;
-            })
-            .join('')
-        );
-      })
-      .join('') || '<div class="empty">Ajoute des ingrédients aux menus pour générer la liste.</div>';
-}
-function shopText() {
-  const items = shoppingItems(),
-    checked = shopChecked();
-  return [
-    '🛒 OliWeight — courses semaine du ' + fmtDate(vStart(), {day: 'numeric', month: 'long'}),
-    ...Object.entries(CATS).flatMap(([c, label]) => {
-      const l = items.filter((i) => i.cat === c && !checked[i.name.toLowerCase()]);
-      return l.length ? ['', label.toUpperCase(), ...l.map((i) => '- ' + i.name)] : [];
-    }),
-  ].join('\n');
-}
 
 /* ---------- Pesée ---------- */

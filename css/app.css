@@ -941,3 +941,35 @@ details.fold[open] > summary::after {
   height: 22px;
   border-radius: 6px;
 }
+/* ---------- Manquants et garde-manger ---------- */
+.ing-box {
+  margin: 4px 0 12px;
+}
+.ing-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.ing {
+  min-height: 36px;
+  padding: 4px 11px;
+  border-radius: 18px;
+  font-size: 0.82rem;
+}
+.ing.miss {
+  border-color: var(--warn);
+  color: var(--warn);
+  background: color-mix(in srgb, var(--warn) 10%, var(--surface));
+  font-weight: 600;
+}
+.miss-cat {
+  color: var(--warn);
+}
+.base-tag {
+  font-style: normal;
+  font-size: 0.7rem;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 1px 7px;
+}

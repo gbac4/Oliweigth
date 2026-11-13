@@ -2,6 +2,10 @@
 
 Format : une entrée par version publiée sur GitHub Pages. La version s'affiche dans Réglages, tout en bas.
 
+## 3.1.0 — 2026-11-13
+- Ingrédients manquants (#15) : sur chaque repas, toucher un ingrédient « Je ne l'ai pas » l'ajoute aux Manquants des courses et propose jusqu'à 3 plats équivalents sans cet ingrédient.
+- Garde-manger : « J'en ai » / « À acheter » ; les produits de base restent cochés d'une semaine à l'autre, les produits frais repartent à zéro. La liste envoyée ne contient que ce qui est à acheter, manquants en premier.
+
 ## 3.0.0 — 2026-11-12
 - Nouvelle interface « Aujourd'hui » (propositions A + B) : anneau des calories compact, boutons rapides (+ Eau, + Extra, + Tétée), repas en fil horaire avec coche d'un geste, prochain repas mis en avant, détails dépliables, « Cuisine fermée » à 21 h ; extras, eau, allaitement et humeur repliés.
 - Nouveau tableau « Progrès » (proposition C) : 4 indicateurs (poids, rythme, jours complets, date probable), poids avec légende, calories, repas respectés en cases, détails repliés.
