@@ -72,3 +72,12 @@ def load_state(pg, state, sync=None):
 
 def state(pg):
     return pg.evaluate("JSON.parse(localStorage.getItem('oliweight.v2'))")
+
+
+def open_meal(pg, i):
+    """Déplie le repas i dans le fil de la journée et renvoie sa carte."""
+    card = pg.locator(".meal-card").nth(i)
+    if card.locator(".tl-body").is_hidden():
+        card.locator("[data-open]").click()
+    return pg.locator(".meal-card").nth(i)
+

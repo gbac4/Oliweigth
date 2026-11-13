@@ -13,12 +13,28 @@ $('nextDay').addEventListener('click', () => {
   }
 });
 $('today').addEventListener('click', (e) => {
-  const st = e.target.closest('[data-status]');
+  const op = e.target.closest('[data-open]');
+  if (op) {
+    const i = Number(op.closest('[data-meal]').dataset.meal);
+    openMeals.has(i) ? openMeals.delete(i) : openMeals.add(i);
+    renderToday();
+    return;
+  }
+  const jp = e.target.closest('[data-jump]');
+  if (jp) {
+    const el = $(jp.dataset.jump);
+    el.open = true;
+    el.scrollIntoView({behavior: 'smooth', block: 'start'});
+    return;
+  }
+  const st = e.target.closest('[data-status],[data-quick]');
   if (st) {
     const i = st.closest('[data-meal]').dataset.meal,
       l = logFor(selectedDate);
     const m = (l.meals[i] = l.meals[i] || {});
-    m.status = m.status === st.dataset.status ? undefined : st.dataset.status;
+    const want = st.dataset.status || st.dataset.quick;
+    m.status = m.status === want ? undefined : want;
+    if (want === 'partial' || want === 'replaced') openMeals.add(Number(i));
     m.code = effCode(selectedDate, i);
     if (!m.status) delete l.meals[i];
     else {

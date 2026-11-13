@@ -18,22 +18,23 @@
 <main>
 <section class="screen" id="onboarding"></section>
 <section class="screen active" id="today">
- <div class="heading"><div><h1>Aujourd’hui</h1><div class="muted small" id="todayLabel"></div></div><div class="row"><button id="prevDay" aria-label="Jour précédent">‹</button><button id="nextDay" aria-label="Jour suivant">›</button></div></div>
- <div id="banners"></div><div class="card ring-card" id="kcalRing"></div><div class="metric-grid" id="todayMetrics"></div>
- <button id="allDone" style="width:100%;margin-top:12px">✅ Tout respecté aujourd’hui</button>
- <div id="todayMeals"></div>
- <div class="card"><h2>Extras hors menu</h2><p class="small muted">Tout ce qui est mangé en plus des repas. Touche un aliment : les calories s’ajoutent seules.</p>
+ <div class="heading"><div><div class="muted small" id="todayLabel"></div><h1 id="helloName">Aujourd’hui</h1></div><div class="row"><button id="prevDay" aria-label="Jour précédent">‹</button><button id="nextDay" aria-label="Jour suivant">›</button></div></div>
+ <div id="banners"></div><div class="card ring-card ring-row" id="kcalRing"></div>
+ <div class="quick-row"><button type="button" data-counter="water" data-delta="250">+ Eau</button><button type="button" data-jump="extrasSec">+ Extra</button><button type="button" id="quickFeed" data-counter="feedsDay" data-delta="1">+ Tétée</button></div>
+ <div class="row between" style="margin:18px 2px 8px"><h2 style="margin:0;font-size:1.1rem">Ma journée</h2><button id="allDone" class="small-btn">Tout respecté</button></div>
+ <div id="todayMeals" class="timeline"></div>
+ <details class="card fold" id="extrasSec"><summary>Extras hors menu <span class="fold-sum" id="extrasSum"></span></summary><p class="small muted">Tout ce qui est mangé en plus des repas. Touche un aliment : les calories s’ajoutent seules.</p>
   <div class="extra-chips" id="extraChips"></div>
   <div class="row"><input id="extraName" type="text" maxlength="60" placeholder="Autre aliment…" style="flex:2;min-height:44px;border:1px solid var(--line);border-radius:11px;background:var(--surface);padding:9px 11px"><input id="extraKcal" type="number" min="0" max="3000" step="10" inputmode="numeric" placeholder="kcal" style="flex:1;max-width:90px"></div>
   <button id="extraAdd" style="width:100%;margin-top:8px">Ajouter l’extra</button>
-  <div id="extrasList" style="margin-top:8px"></div><div class="small muted" id="extrasTotal" style="margin-top:6px"></div></div>
- <div class="card"><h2>Hydratation et mouvement</h2>
+  <div id="extrasList" style="margin-top:8px"></div><div class="small muted" id="extrasTotal" style="margin-top:6px"></div></details>
+ <details class="card fold"><summary>Eau, pas et sommeil <span class="fold-sum" id="waterSum"></span></summary>
   <div class="row between"><div><b>Eau</b><div class="muted small">Objectif : <span id="waterGoalLabel">2 500</span> ml · 1 verre = 250 ml</div></div><div class="counter"><button data-counter="water" data-delta="-250" aria-label="Retirer un verre">−</button><strong id="waterValue">0 ml</strong><button data-counter="water" data-delta="250" aria-label="Ajouter un verre">+</button></div></div>
   <div class="field"><label for="steps">Pas</label><input id="steps" type="number" min="0" step="100" inputmode="numeric" placeholder="Ex. 4500"></div>
   <div class="field"><label for="sleep">Sommeil (heures)</label><input id="sleep" type="number" min="0" max="24" step=".25" inputmode="decimal" placeholder="Ex. 7,5"></div>
- </div>
- <div class="card" id="feedsCard"><h2>Allaitement</h2><div class="row between"><span>Tétées de jour</span><div class="counter"><button data-counter="feedsDay" data-delta="-1" aria-label="Retirer une tétée de jour">−</button><strong id="feedsDayValue">0</strong><button data-counter="feedsDay" data-delta="1" aria-label="Ajouter une tétée de jour">+</button></div></div><div class="row between" style="margin-top:12px"><span>Tétées de nuit</span><div class="counter"><button data-counter="feedsNight" data-delta="-1" aria-label="Retirer une tétée de nuit">−</button><strong id="feedsNightValue">0</strong><button data-counter="feedsNight" data-delta="1" aria-label="Ajouter une tétée de nuit">+</button></div></div></div>
- <div class="card"><h2>Comment te sens-tu ?</h2><div class="field"><label>Énergie (1 = très basse, 5 = excellente)</label><div class="scale" id="energyScale"></div></div><div class="field"><label>Faim (1 = faible, 5 = très forte)</label><div class="scale" id="hungerScale"></div></div><div class="field"><label for="note">Note de la journée</label><textarea id="note" placeholder="Faim, fatigue, humeur, contexte…"></textarea></div><div class="small muted">Tout est enregistré automatiquement.</div></div>
+ </details>
+ <details class="card fold" id="feedsCard"><summary>Allaitement <span class="fold-sum" id="feedsSum"></span></summary><div class="row between"><span>Tétées de jour</span><div class="counter"><button data-counter="feedsDay" data-delta="-1" aria-label="Retirer une tétée de jour">−</button><strong id="feedsDayValue">0</strong><button data-counter="feedsDay" data-delta="1" aria-label="Ajouter une tétée de jour">+</button></div></div><div class="row between" style="margin-top:12px"><span>Tétées de nuit</span><div class="counter"><button data-counter="feedsNight" data-delta="-1" aria-label="Retirer une tétée de nuit">−</button><strong id="feedsNightValue">0</strong><button data-counter="feedsNight" data-delta="1" aria-label="Ajouter une tétée de nuit">+</button></div></div></details>
+ <details class="card fold"><summary>Comment te sens-tu ? <span class="fold-sum" id="moodSum"></span></summary><div class="field"><label>Énergie (1 = très basse, 5 = excellente)</label><div class="scale" id="energyScale"></div></div><div class="field"><label>Faim (1 = faible, 5 = très forte)</label><div class="scale" id="hungerScale"></div></div><div class="field"><label for="note">Note de la journée</label><textarea id="note" placeholder="Faim, fatigue, humeur, contexte…"></textarea></div><div class="small muted">Tout est enregistré automatiquement.</div></details>
  <p class="footer-note">OliWeight est un carnet de suivi, pas un dispositif médical. Pendant l’allaitement, la perte visée reste de 0,5 kg par semaine au maximum. Fais valider le plan par une diététiste (Santé811) ou ton médecin.</p>
 </section>
 
@@ -64,14 +65,13 @@
 </section>
 
 <section class="screen" id="progress">
- <div class="heading"><div><h1>Progrès</h1><div class="muted small">Tendances, sans jugement</div></div></div>
+ <div class="heading"><div><h1>Progrès</h1><div class="muted small">7 derniers jours · tendances, sans jugement</div></div></div>
+ <div class="kpi-grid" id="progressKpis"></div>
  <div id="alerts"></div>
- <div class="card"><h2>Bilan des 7 derniers jours</h2><div class="metric-grid" id="weekMetrics"></div><h3 style="margin-top:16px">Repas par moment de la journée</h3><div id="slotAdherence"></div><div class="small muted">Plein = respecté · demi = partiel ou remplacé. Le moment le plus faible est celui à ajuster en priorité.</div></div>
- <div class="card"><h2>Objectif</h2><div id="goal"></div></div>
- <div class="card"><h2>Poids et ligne cible</h2><div class="chart-wrap"><canvas id="weightChart" aria-label="Graphique du poids, de la tendance et de la cible"></canvas></div><div class="small muted" id="weightTrendText"></div><div class="small muted">Ligne pointillée : cible indicative, plafonnée à −0,5 kg/semaine. Le poids varie d’un jour à l’autre (eau, lait) : c’est la tendance qui compte.</div></div>
- <div class="card"><h2>Calories — 7 derniers jours</h2><svg class="kbars" id="kcalBars" role="img" aria-label="Calories mangées par jour et limite"></svg><div class="small muted" id="kcalBarsText"></div></div>
- <div class="card"><h2>Raisons les plus fréquentes</h2><div id="reasons"></div></div>
- <div class="card"><h2>Moyennes — 7 derniers jours</h2><div class="metric-grid" id="averages"></div></div>
+ <div class="card"><div class="row between"><h2 style="margin:0">Poids</h2><span class="small muted" id="goalTarget"></span></div><div id="goal"></div><div class="chart-wrap"><canvas id="weightChart" aria-label="Graphique du poids, de la tendance et de la cible"></canvas></div><div class="legend"><span><i class="lg-line"></i>Mon poids</span><span><i class="lg-dash"></i>Cible</span><span><i class="lg-trend"></i>Tendance</span></div><div class="small muted" id="weightTrendText"></div></div>
+ <div class="card"><h2>Calories</h2><svg class="kbars" id="kcalBars" role="img" aria-label="Calories mangées par jour et limite"></svg><div class="small muted" id="kcalBarsText"></div></div>
+ <div class="card"><h2>Repas respectés</h2><div id="slotAdherence"></div><div class="legend"><span><i class="lg-full"></i>Respecté</span><span><i class="lg-part"></i>Partiel ou remplacé</span><span><i class="lg-none"></i>Non noté ou sauté</span></div></div>
+ <details class="card fold"><summary>Détails de la semaine</summary><div class="metric-grid" id="weekMetrics"></div><h3 style="margin-top:14px">Raisons les plus fréquentes</h3><div id="reasons"></div><h3 style="margin-top:14px">Moyennes</h3><div class="metric-grid" id="averages"></div></details>
  <button class="primary" id="weeklyCopy2" style="width:100%">📋 Copier le résumé pour Bertrand</button>
 </section>
 

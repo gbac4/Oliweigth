@@ -1,4 +1,5 @@
 'use strict';
+let openMeals = new Set();
 /* OliWeight — écran Aujourd'hui : anneau des calories, repas, extras */
 function renderExtras() {
   const l = data.logs[selectedDate] || {},
@@ -54,8 +55,8 @@ function renderRing() {
     [x2, y2] = ang(Math.min(minFrac, 1));
   $('kcalRing').innerHTML =
     `<div class="ring-wrap"><svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="${R}" fill="none" stroke="var(--surface2)" stroke-width="16"/><circle cx="100" cy="100" r="${R}" fill="none" stroke="${over ? 'var(--warn)' : 'var(--brand)'}" stroke-width="16" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - frac)}" style="transition:stroke-dashoffset .6s ease"/>${minFrac < 1 ? `<line x1="${100 + (R - 12) * Math.cos(minFrac * 2 * Math.PI)}" y1="${100 + (R - 12) * Math.sin(minFrac * 2 * Math.PI)}" x2="${100 + (R + 12) * Math.cos(minFrac * 2 * Math.PI)}" y2="${100 + (R + 12) * Math.sin(minFrac * 2 * Math.PI)}" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round"/>` : ''}</svg><div class="ring-center"><strong>${fmtK(k)}</strong><span>/ ${fmtK(lim)} kcal</span><span>mangées</span></div></div>
- <div class="ring-state" style="color:${cls}">${esc(state)}</div>
- <div class="ring-legend"><span><i style="background:var(--brand)"></i>Mangées</span><span><i style="background:var(--text)"></i>Minimum ${fmtK(kcalMin())}</span><span>Prévu aujourd’hui ≈ ${fmtK(plan)}</span></div>${unknown ? `<div class="small muted" style="margin-top:6px">${unknown} repas remplacé${unknown > 1 ? 's' : ''} sans calories : ajoute une estimation pour un total juste.</div>` : ''}`;
+ <div class="ring-side"><div class="ring-state" style="color:${cls}">${esc(state)}</div><div class="row wrap" style="gap:6px"><span class="chip">${mealsDone(data.logs[d] || {})}/5 repas</span><span class="chip">${fr(num(data.logs[d]?.water) / 1000)} L d’eau</span></div>
+ <div class="small muted">Minimum ${fmtK(kcalMin())} · prévu ≈ ${fmtK(plan)}</div>${unknown ? `<div class="small muted" style="margin-top:6px">${unknown} repas remplacé${unknown > 1 ? 's' : ''} sans calories : ajoute une estimation pour un total juste.</div>` : ''}</div>`;
   $('kcalRing').setAttribute('aria-label', `${fmtK(k)} calories mangées sur une limite de ${fmtK(lim)}. ${state}`);
 }
 function renderToday() {
@@ -73,38 +74,54 @@ function renderToday() {
   if (document.activeElement?.id !== 'steps') $('steps').value = l.steps ?? '';
   if (document.activeElement?.id !== 'sleep') $('sleep').value = l.sleep ?? '';
   if (document.activeElement?.id !== 'note') $('note').value = l.note ?? '';
-  $('todayMetrics').innerHTML =
-    `<div class="metric"><strong>${mealsDone(l)}/5</strong><span>Repas respectés</span></div><div class="metric"><strong>${num(l.water).toLocaleString('fr-FR')} ml</strong><span>Eau / ${num(s.waterGoal).toLocaleString('fr-FR')}</span></div><div class="metric"><strong>${num(l.steps).toLocaleString('fr-FR')}</strong><span>Pas / ${num(s.stepsGoal).toLocaleString('fr-FR')}</span></div><div class="metric"><strong>${num(l.feedsDay) + num(l.feedsNight)}</strong><span>Tétées</span></div>`;
+  const pr = data.profile || {};
+  $('helloName').textContent =
+    selectedDate === t
+      ? pr.prenom
+        ? `Bonjour ${pr.prenom}`
+        : 'Aujourd’hui'
+      : fmtDate(selectedDate, {weekday: 'long', day: 'numeric'});
+  $('waterSum').textContent = `${fr(num(l.water) / 1000)} L · ${num(l.steps).toLocaleString('fr-FR')} pas`;
+  $('feedsSum').textContent = `${num(l.feedsDay) + num(l.feedsNight)} tétées`;
+  $('moodSum').textContent = l.energy ? `énergie ${l.energy}/5` : '';
+  $('extrasSum').textContent = (l.extras || []).length ? `${l.extras.length} · ≈ ${fmtK(extrasKcal(l))} kcal` : '';
+  $('quickFeed').classList.toggle('hidden', !isBreastfeeding());
   renderRing();
   renderExtras();
   const slots = effCodes(selectedDate),
-    base = planFor(selectedDate);
-  $('todayMeals').innerHTML = slots
-    .map((code, i) => {
-      const m = data.meals[code] || {nom: code, details: ''},
-        v = l.meals[i] || {};
-      const opts = [
-        base[i],
-        ...(code !== base[i] ? [code] : []),
-        ...equivalents(base[i], i).map((r) => r.code),
-        ...pinnedOptions(i),
-      ].filter((c, j, a) => a.indexOf(c) === j && (j < 2 || c !== code));
-      opts.forEach(ensureMeal);
-      return `<article class="card meal-card" data-meal="${i}"><div class="row between"><div><div class="pill">${esc(SLOTS[i])} · ${esc(code)} · ≈ ${fmtK(kcalOf(code))} kcal</div><div class="meal-title" style="margin-top:7px">${esc(m.nom)}</div></div><span class="pill ${v.status === 'done' ? 'ok' : ''}">${esc(STATUS_LABEL[v.status] || 'À faire')}</span></div>${photoBlock(m)}<div class="meal-detail">${esc(m.details)}</div>${opts.length > 1 ? `<div class="field" style="margin-top:-4px"><label class="small muted">Changer pour un plat équivalent (calories proches)</label><select data-alt>${opts.map((c) => `<option value="${esc(c)}" ${c === code ? 'selected' : ''}>${c === base[i] ? 'Prévu : ' : ''}${esc(data.meals[c].nom)} · ≈ ${fmtK(kcalOf(c))} kcal</option>`).join('')}</select></div>` : ''}<div class="statuses">${[
-        ['done', '✅ Fait'],
-        ['partial', '🟡 Partiel'],
-        ['replaced', '🔄 Remplacé'],
-        ['skipped', '❌ Sauté'],
-      ]
-        .map(
-          ([st, label]) =>
-            `<button data-status="${st}" class="${v.status === st ? 'active' : ''}" aria-pressed="${v.status === st}">${label}</button>`,
-        )
-        .join(
-          '',
-        )}</div><div class="${v.status === 'partial' ? '' : 'hidden'}"><div class="small muted" style="margin-top:10px">Pourquoi partiel ?</div><div class="reason-list">${REASONS.map((r) => `<label><input type="checkbox" data-reason="${esc(r)}" ${(v.reasons || []).includes(r) ? 'checked' : ''}> ${esc(r)}</label>`).join('')}</div></div><div class="${v.status === 'replaced' ? '' : 'hidden'} field"><label>Par quoi as-tu remplacé ce repas ?</label><input data-replacement type="text" maxlength="160" value="${esc(v.replacement || '')}" placeholder="Ex. 2 beignets + bouillie"><label class="small muted" style="margin-top:6px">Calories estimées (facultatif)</label><input data-repl-kcal type="number" min="0" max="3000" step="10" inputmode="numeric" value="${v.kcal || ''}" placeholder="Ex. 450"></div><div class="adds">${ADDS.map(([lab, k], j) => `<button type="button" data-add="${j}">+ ${esc(lab.split(' +')[0])} <span class="muted">${k}</span></button>`).join('')}</div>${(v.adds || []).length ? `<div class="adds-info">Ajouts : ${esc(v.adds.map((a) => a.label).join(', '))} · +${fmtK(addsKcal(v))} kcal <button type="button" data-add-undo style="min-height:30px;padding:2px 8px;font-size:.75rem">Annuler le dernier</button></div>` : ''}</article>`;
-    })
-    .join('');
+    base = planFor(selectedDate),
+    nextIdx = selectedDate === t ? slots.findIndex((_, i) => !l.meals[i]?.status) : -1;
+  $('todayMeals').innerHTML =
+    slots
+      .map((code, i) => {
+        const m = data.meals[code] || {nom: code, details: ''},
+          v = l.meals[i] || {};
+        const opts = [
+          base[i],
+          ...(code !== base[i] ? [code] : []),
+          ...equivalents(base[i], i).map((r) => r.code),
+          ...pinnedOptions(i),
+        ].filter((c, j, a) => a.indexOf(c) === j && (j < 2 || c !== code));
+        opts.forEach(ensureMeal);
+        const [slotName, slotTime] = SLOTS[i].split(' · '),
+          isNext = i === nextIdx,
+          open = openMeals.has(i);
+        return `<article class="tl-item meal-card st-${v.status || 'todo'} ${isNext ? 'is-next' : ''}" data-meal="${i}"><div class="tl-time">${esc(slotTime || '')}</div><div class="tl-rail" aria-hidden="true"></div><div class="tl-card"><div class="tl-head"><button type="button" class="tl-check ${v.status === 'done' ? 'on' : ''}" data-quick="done" aria-pressed="${v.status === 'done'}" aria-label="${v.status === 'done' ? 'Annuler : ' : 'Marquer comme respecté : '}${esc(m.nom)}">${v.status === 'done' ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>' : ''}</button><button type="button" class="tl-open" data-open aria-expanded="${open}"><span class="tl-slot"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(slotName)} · ${fmtK(kcalOf(code))} kcal</span><span class="tl-tag">${esc(v.status ? STATUS_LABEL[v.status] : isNext ? 'Maintenant' : '')}</span></span><span class="tl-name">${esc(m.nom)}</span></button></div><div class="tl-body ${open ? '' : 'hidden'}">${photoBlock(m)}<div class="meal-detail">${esc(m.details)}</div>${opts.length > 1 ? `<div class="field" style="margin-top:-4px"><label class="small muted">Changer pour un plat équivalent (calories proches)</label><select data-alt>${opts.map((c) => `<option value="${esc(c)}" ${c === code ? 'selected' : ''}>${c === base[i] ? 'Prévu : ' : ''}${esc(data.meals[c].nom)} · ≈ ${fmtK(kcalOf(c))} kcal</option>`).join('')}</select></div>` : ''}<div class="statuses">${[
+          ['done', '✅ Fait'],
+          ['partial', '🟡 Partiel'],
+          ['replaced', '🔄 Remplacé'],
+          ['skipped', '❌ Sauté'],
+        ]
+          .map(
+            ([st, label]) =>
+              `<button data-status="${st}" class="${v.status === st ? 'active' : ''}" aria-pressed="${v.status === st}">${label}</button>`,
+          )
+          .join(
+            '',
+          )}</div><div class="${v.status === 'partial' ? '' : 'hidden'}"><div class="small muted" style="margin-top:10px">Pourquoi partiel ?</div><div class="reason-list">${REASONS.map((r) => `<label><input type="checkbox" data-reason="${esc(r)}" ${(v.reasons || []).includes(r) ? 'checked' : ''}> ${esc(r)}</label>`).join('')}</div></div><div class="${v.status === 'replaced' ? '' : 'hidden'} field"><label>Par quoi as-tu remplacé ce repas ?</label><input data-replacement type="text" maxlength="160" value="${esc(v.replacement || '')}" placeholder="Ex. 2 beignets + bouillie"><label class="small muted" style="margin-top:6px">Calories estimées (facultatif)</label><input data-repl-kcal type="number" min="0" max="3000" step="10" inputmode="numeric" value="${v.kcal || ''}" placeholder="Ex. 450"></div><div class="adds">${ADDS.map(([lab, k], j) => `<button type="button" data-add="${j}">+ ${esc(lab.split(' +')[0])} <span class="muted">${k}</span></button>`).join('')}</div>${(v.adds || []).length ? `<div class="adds-info">Ajouts : ${esc(v.adds.map((a) => a.label).join(', '))} · +${fmtK(addsKcal(v))} kcal <button type="button" data-add-undo style="min-height:30px;padding:2px 8px;font-size:.75rem">Annuler le dernier</button></div>` : ''}</div></div></article>`;
+      })
+      .join('') +
+    `<article class="tl-item is-stop"><div class="tl-time">${esc(s.cutoffTime || '21:00').replace(':00', ' h')}</div><div class="tl-rail" aria-hidden="true"></div><div class="tl-card tl-stop"><b>Cuisine fermée</b><div class="small muted">Eau ou tisane sans sucre.</div></div></article>`;
   ['energy', 'hunger'].forEach((k) => {
     $(k + 'Scale').innerHTML = [1, 2, 3, 4, 5]
       .map(
