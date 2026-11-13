@@ -20,6 +20,27 @@ $('today').addEventListener('click', (e) => {
     renderToday();
     return;
   }
+  const mi = e.target.closest('[data-miss]');
+  if (mi) {
+    const it = {key: mi.dataset.miss, name: mi.dataset.missName, cat: mi.dataset.missCat};
+    if (isMissing(it.key)) delete missingMap()[it.key];
+    else markMissing(it);
+    save();
+    renderToday();
+    return;
+  }
+  const tk = e.target.closest('[data-take]');
+  if (tk) {
+    const i = tk.closest('[data-meal]').dataset.meal,
+      l = logFor(selectedDate);
+    ensureMeal(tk.dataset.take);
+    l.alt = {...(l.alt || {}), [i]: tk.dataset.take};
+    if (l.meals[i]) l.meals[i].code = tk.dataset.take;
+    save();
+    renderToday();
+    toast('Plat changé pour aujourd’hui.');
+    return;
+  }
   const jp = e.target.closest('[data-jump]');
   if (jp) {
     const el = $(jp.dataset.jump);
@@ -242,9 +263,7 @@ $('swapUndo').addEventListener('click', () => {
 $('shopList').addEventListener('change', (e) => {
   const k = e.target.dataset.shop;
   if (k === undefined) return;
-  const c = shopChecked();
-  if (e.target.checked) c[k] = true;
-  else delete c[k];
+  setHave({key: k, name: e.target.dataset.shopName, cat: e.target.dataset.shopCat}, e.target.checked);
   save();
   renderShop();
 });
