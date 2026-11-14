@@ -64,3 +64,37 @@ def test_create_recipe_on_screen(page):
     page.select_option("[data-pck=side]", "riz")
     assert "riz" in page.locator("[data-pcbox]").inner_text().lower()
     assert page.locator("#recipeList details[open]").count() == 1
+
+
+def test_plausibility_flags_typos_not_rich_dishes(page):
+    w = page.evaluate
+    # kpwem avec son poids cuit réaliste : plat riche, aucune alerte
+    assert w("recipeWarnings({...STANDARD_RECIPES.kpwem, parts: 0, potG: 2800})") == []
+    assert w("recipeWarnings(STANDARD_RECIPES.kpwem)") == []
+    # erreur d'unité : 740 boîtes de crème de palme
+    assert len(w("recipeWarnings({potG: 3000, ing: [{food: 'creme-palme', g: 296000}]})")) >= 1
+    # huile oubliée, beaucoup d'eau
+    assert "très peu" in w("recipeWarnings({potG: 3000, ing: [{food: 'epinards', g: 1000}]})")[0]
+    # poids cuit incohérent
+    assert any("moitié" in x for x in w("recipeWarnings({potG: 500, ing: [{food: 'riz', g: 1500}]})"))
+    assert "très élevé" in w("recipeWarnings({parts: 1, ing: [{food: 'huile', g: 500}]})")[0]
+
+
+def test_save_anyway(page):
+    load_state(page, fixture("backup-v2.0.3.json"))
+    page.click("[data-screen=menus]")
+    page.click("[data-menutab=recipes]")
+    page.click("#crNew")
+    page.fill("#crNom", "Soupe")
+    page.dispatch_event("#crNom", "change")
+    page.select_option("[data-cri='0'][data-crk=food]", "epinards")
+    page.fill("[data-cri='0'][data-crk=qty]", "500")
+    page.dispatch_event("[data-cri='0'][data-crk=qty]", "change")
+    page.fill("#crPot", "3000")
+    page.dispatch_event("#crPot", "change")
+    page.click("#crSave")
+    assert "Valeur inhabituelle" in page.inner_text("#crErr")
+    assert not state(page).get("customRecipes")
+    page.click("#crForce")
+    rec = list(state(page)["customRecipes"].values())
+    assert rec[0]["ing"] == [{"food": "epinards", "g": 500}]  # recette inchangée
