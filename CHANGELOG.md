@@ -2,6 +2,9 @@
 
 Format : une entrée par version publiée sur GitHub Pages. La version s'affiche dans Réglages, tout en bas.
 
+## 3.4.2 — 2026-11-13
+- Recette maison (#25) : alerte « valeur inhabituelle » à l'enregistrement pour repérer une faute de frappe ou d'unité (moins de 0,4 ou plus de 3,5 kcal par gramme cuit, marmite cuite plus légère que la moitié des ingrédients, part de moins de 100 ou plus de 1 500 kcal). Rien n'est bloqué ni modifié : « Enregistrer quand même ». Un plat riche comme le kpwem ne déclenche rien.
+
 ## 3.4.1 — 2026-11-13
 - Refaire mes menus (#23) : après un changement de profil (cuisine pour 2 jours, goûts, budget…), un bouton refait les menus à partir du lundi suivant. La semaine en cours et ses courses ne changent pas. Proposé seulement pour les menus créés par l'app, pas pour un cycle publié.
 

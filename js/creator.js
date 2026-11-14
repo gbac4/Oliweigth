@@ -82,6 +82,35 @@ function portionText(r, p, side) {
   return a.join(' + ');
 }
 var portionState = {};
+/* ---------- Contrôle de vraisemblance (fiche #25) ----------
+   Repère une faute de frappe ou d'unité, pas un plat « trop riche » : un plat riche reste accepté tel quel. */
+const PLAUSIBLE = {minPerG: 0.4, maxPerG: 3.5, minPotRatio: 0.5, minPart: 100, maxPart: 1500};
+function recipeWarnings(r) {
+  const t = recipeTotals(r),
+    raw = (r.ing || []).reduce((s, x) => s + num(x.g), 0),
+    potG = num(r.potG),
+    w = [];
+  if (potG > 0) {
+    if (t.perG < PLAUSIBLE.minPerG)
+      w.push(
+        `${fr(t.perG, 2)} kcal par gramme cuit, c'est très peu : un ingrédient oublié (huile, viande) ou un poids de marmite trop élevé ?`,
+      );
+    if (t.perG > PLAUSIBLE.maxPerG)
+      w.push(
+        `${fr(t.perG, 2)} kcal par gramme cuit, c'est très élevé : une erreur d'unité (boîte au lieu de g) ou un poids de marmite trop faible ?`,
+      );
+    if (raw > 0 && potG < raw * PLAUSIBLE.minPotRatio)
+      w.push(
+        `La marmite cuite (${fmtK(potG)} g) pèse moins de la moitié des ingrédients (${fmtK(raw)} g) : le poids cuit est-il juste ?`,
+      );
+  } else if (num(r.parts) > 0) {
+    if (t.perPart < PLAUSIBLE.minPart)
+      w.push(`${fmtK(t.perPart)} kcal par part, c'est très peu : le nombre de parts est-il juste ?`);
+    if (t.perPart > PLAUSIBLE.maxPart)
+      w.push(`${fmtK(t.perPart)} kcal par part, c'est très élevé : une erreur d'unité ou trop peu de parts ?`);
+  }
+  return w;
+}
 /* ---------- Banque : recettes créées par la personne ---------- */
 function customRecipes() {
   data.customRecipes = data.customRecipes || {};
@@ -163,7 +192,7 @@ function renderCreator() {
   <div class="row wrap"><div class="field grow"><label for="crPot">Poids de la marmite cuite (g, sans la marmite)</label><input id="crPot" data-cr="potG" type="number" min="0" inputmode="numeric" value="${draft.potG || ''}" placeholder="Ex. 2700"></div>
   <div class="field grow"><label for="crParts">Ou nombre de parts égales</label><input id="crParts" data-cr="parts" type="number" min="1" inputmode="numeric" value="${draft.parts || ''}" placeholder="Ex. 18"></div></div>
   <div class="alert info" id="crTotals">Marmite ≈ <b>${fmtK(t.kcal)} kcal</b> · ${t.prot} g de protéines${t.perG ? ` · ${fr(t.perG, 2)} kcal/g` : t.perPart ? ` · ${fmtK(t.perPart)} kcal la part` : ' · indique le poids cuit ou le nombre de parts'}</div>
-  <div id="crErr" class="alert danger hidden"></div>
+  <div id="crErr" class="alert danger hidden" role="alert"></div>
   <div class="row wrap"><button class="primary grow" id="crSave">Enregistrer la recette</button><button id="crCancel">Annuler</button></div></div>`;
 }
 function readDraftField(el) {
@@ -217,7 +246,8 @@ document.addEventListener('click', (e) => {
     draft = null;
     return renderCreator();
   }
-  if (e.target.closest('#crSave')) {
+  const sv = e.target.closest('#crSave, #crForce');
+  if (sv) {
     const ing = draft.ing.filter((x) => FOODS[x.food] && num(x.g) > 0),
       err = [];
     if (!draft.nom.trim()) err.push('le nom du plat');
@@ -225,6 +255,14 @@ document.addEventListener('click', (e) => {
     if (!(num(draft.potG) > 0) && !(num(draft.parts) > 0)) err.push('le poids cuit ou le nombre de parts');
     if (err.length) {
       $('crErr').textContent = 'Il manque : ' + err.join(', ') + '.';
+      $('crErr').classList.remove('hidden');
+      return;
+    }
+    // Fiche #25 : erreur de saisie probable ? On prévient sans bloquer, la recette n'est jamais modifiée.
+    const warn = recipeWarnings({...draft, ing});
+    if (warn.length && sv.id !== 'crForce') {
+      $('crErr').innerHTML =
+        `<b>Valeur inhabituelle, vérifie tes quantités :</b><ul>${warn.map((w) => `<li>${esc(w)}</li>`).join('')}</ul>Si tout est juste, enregistre quand même : la portion s'adaptera.<button type="button" id="crForce" style="margin-top:8px;width:100%">Enregistrer quand même</button>`;
       $('crErr').classList.remove('hidden');
       return;
     }
