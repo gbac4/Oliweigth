@@ -1,0 +1,32 @@
+# Étiquette chaque version publiée (vX.Y.Z) à partir de APP_VERSION dans js/config.js.
+# Tourne à chaque fusion sur main ; « Run workflow » à la main étiquette aussi les anciennes versions.
+name: Étiquettes de version
+on:
+  push:
+    branches: [main]
+    paths: [js/config.js]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Créer les étiquettes manquantes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # dernier commit de main (fusion) pour chaque version, du plus récent au plus ancien
+          git log --format=%H --first-parent main -- js/config.js | while read c; do
+            v=$(git show "$c:js/config.js" | grep -o "APP_VERSION = '[0-9.]*'" | grep -o "[0-9][0-9.]*[0-9]" || true)
+            [ -n "$v" ] && echo "$v $c"
+          done | awk '!seen[$1]++' | while read v c; do
+            if ! git rev-parse -q --verify "refs/tags/v$v" >/dev/null; then
+              git tag -a "v$v" "$c" -m "OliWeight $v"
+              echo "Étiquette v$v → ${c:0:7}"
+            fi
+          done
+          git push origin --tags
