@@ -2,6 +2,9 @@
 
 Format : une entrée par version publiée sur GitHub Pages. La version s'affiche dans Réglages, tout en bas.
 
+## 3.4.1 — 2026-11-13
+- Refaire mes menus (#23) : après un changement de profil (cuisine pour 2 jours, goûts, budget…), un bouton refait les menus à partir du lundi suivant. La semaine en cours et ses courses ne changent pas. Proposé seulement pour les menus créés par l'app, pas pour un cycle publié.
+
 ## 3.4.0 — 2026-11-13
 - Calories personnalisées (#21), calculées dans le téléphone sans IA : Mifflin-St Jeor (poids de la dernière pesée, taille, âge, sexe) × activité + allaitement (+330 kcal de 0 à 6 mois, +400 ensuite, moitié si partiel) − déficit pour la perte visée (plafonné à 25 % et à 500 kcal en allaitement), jamais sous le minimum. Le détail du calcul s'affiche dans Réglages.
 - Ajustement selon la balance : après au moins 3 semaines de pesées (hors 2 premières semaines), l'app compare la perte réelle à la perte visée et propose −100 kcal (trop lent) ou +150 kcal (trop rapide). La personne accepte ou non ; prochaine vérification 3 semaines plus tard.

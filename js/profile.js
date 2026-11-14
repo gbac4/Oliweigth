@@ -245,7 +245,7 @@ function renderProfileCard() {
   if (!$('profileForm')) return;
   $('profileForm').innerHTML = profileFormHTML('pf-');
   const w = profileWarnings(data.profile || {});
-  $('profileWarn').innerHTML = w.map((x) => `<div class="alert">${esc(x)}</div>`).join('');
+  $('profileWarn').innerHTML = w.map((x) => `<div class="alert">${esc(x)}</div>`).join('') + regenButtonHTML();
 }
 function profileBanners() {
   const b = [],
