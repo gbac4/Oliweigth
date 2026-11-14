@@ -2,6 +2,10 @@
 
 Format : une entrée par version publiée sur GitHub Pages. La version s'affiche dans Réglages, tout en bas.
 
+## 3.4.3 — 2026-11-14
+- Quantités recalculées (#27) : quand la portion du jour n'est pas ×1, le texte du repas affiche directement les quantités ajustées (g et ml au 5 g, tasses et cuillères au ¼, pièces entières). Arrondi vers le bas pour ne pas dépasser, au plus proche si le budget est déjà au minimum ; une tasse suivie de ses grammes suit les grammes. Le menu d'origine reste affiché en petit.
+- Correction : le total « prévu » du jour déduit maintenant les ingrédients retirés ou remplacés, même avant de cocher le repas.
+
 ## 3.4.2 — 2026-11-13
 - Recette maison (#25) : alerte « valeur inhabituelle » à l'enregistrement pour repérer une faute de frappe ou d'unité (moins de 0,4 ou plus de 3,5 kcal par gramme cuit, marmite cuite plus légère que la moitié des ingrédients, part de moins de 100 ou plus de 1 500 kcal). Rien n'est bloqué ni modifié : « Enregistrer quand même ». Un plat riche comme le kpwem ne déclenche rien.
 

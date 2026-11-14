@@ -156,3 +156,58 @@ document.addEventListener('click', (e) => {
     renderToday();
   }
 });
+
+/* ---------- Quantités écrites recalculées (fiche #27) ----------
+   Les menus sont en texte libre : on réécrit seulement les quantités au format connu.
+   Arrondi vers le bas (perte de poids), au plus proche si le budget est déjà au plancher. */
+const FRAC = {'¼': 0.25, '½': 0.5, '¾': 0.75};
+const FRAC_TXT = {0.25: '¼', 0.5: '½', 0.75: '¾'};
+const PIECES = 'œufs?|oeufs?|tranches?|bananes?|plantains?|pommes?|oranges?|galettes?|biscottes?|dattes?|pains?';
+function roundStep(v, step, mode) {
+  const r = mode === 'near' ? Math.round(v / step) : Math.floor(v / step + 1e-9);
+  return Math.max(step, r * step);
+}
+function fracText(v) {
+  const w = Math.floor(v),
+    f = FRAC_TXT[Math.round((v - w) * 100) / 100] || '';
+  return w ? `${w}${f ? ' ' + f : ''}` : f;
+}
+function roundMode(date) {
+  return dayGoal(date) <= kcalMin() * 1.03 ? 'near' : 'down';
+}
+function scaleText(text, f, mode = 'down') {
+  if (!text || f === 1) return text;
+  return (
+    String(text)
+      // grammes, ml : au 5 près
+      .replace(
+        /(\d+(?:[.,]\d+)?)(\s?)(g|ml)\b/g,
+        (all, n, sp, u) => `${roundStep(num(n.replace(',', '.')) * f, 5, mode)}${sp}${u}`,
+      )
+      // tasses et cuillères : au ¼ près
+      .replace(
+        /((?:\d+\s)?[¼½¾]|\d+(?:[.,]\d+)?)(\s(?:de\s)?)(tasses?|c\. à soupe|c\. à thé)/g,
+        (all, n, mid, u, off, str) => {
+          // grammes précisés juste après : la tasse suit au plus proche, pour rester cohérente avec eux
+          const m2 = /^[^()]{0,40}\(\d+\s?g\)/.test(str.slice(off + all.length)) ? 'near' : mode;
+          const v = n
+            .trim()
+            .split(/\s+/)
+            .reduce((t, x) => t + (FRAC[x] ?? num(x.replace(',', '.'))), 0);
+          const s = roundStep(v * f, 0.25, m2),
+            unit = u.startsWith('tasse') ? (s > 1 ? 'tasses' : 'tasse') : u;
+          return `${fracText(s)}${s < 1 ? mid : ' '}${unit}`;
+        },
+      )
+      // pièces : nombre entier
+      .replace(new RegExp(`\\b(\\d+)(\\s)(${PIECES})\\b`, 'g'), (all, n, sp, u) => {
+        const s = Math.max(1, mode === 'near' ? Math.round(num(n) * f) : Math.floor(num(n) * f + 1e-9));
+        return `${s}${sp}${s > 1 && !/s$/.test(u) ? u + 's' : s === 1 && /s$/.test(u) ? u.slice(0, -1) : u}`;
+      })
+      // nombre approximatif entre parenthèses, ex. « (environ 12) » amandes
+      .replace(
+        /\(environ (\d+)\)/g,
+        (all, n) => `(environ ${Math.max(1, mode === 'near' ? Math.round(num(n) * f) : Math.floor(num(n) * f))})`,
+      )
+  );
+}

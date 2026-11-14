@@ -23,7 +23,8 @@ function dayKcal(date, onlyDone) {
   return activeSlots(date).reduce((t, i) => {
     const st = l?.meals?.[i]?.status;
     if (onlyDone && !(st === 'done' || st === 'partial')) return t;
-    return t + slotKcal(date, i);
+    // fiche #27 : les ingrédients retirés ou remplacés comptent aussi dans le prévu
+    return t + slotKcal(date, i) + (st === 'replaced' || st === 'skipped' ? 0 : swapDelta(l?.meals?.[i]));
   }, 0);
 }
 // Budget personnalisé s'il est calculable, sinon la limite manuelle des réglages
