@@ -66,3 +66,18 @@ def test_staples_persist_across_weeks_fresh_do_not(page):
     assert page.locator('#shopList [data-shop="riz"]').is_checked()
     assert not page.locator('#shopList [data-shop="tomates"]').is_checked()
     assert "- Riz" not in page.evaluate("shopText()")
+
+
+def test_ingredient_recognition_fiche30(page):
+    t = lambda n: page.evaluate(f"typicalKcal({n!r})")
+    assert t("Œufs") == 140 and t("œuf") == 140 and t("Oeufs") == 140
+    assert t("Bœuf maigre") == 240 and t("boeuf haché") == 240
+    assert t("Laitue") == 20 and t("Lait 1 %") == 80
+    assert t("Soupe aux pois maison") != 70 and t("Maïs en grains") == 70
+    assert t("Ail") == 3 and t("Volaille") != 3
+
+
+def test_removing_eggs_from_omelette(page):
+    r = page.evaluate("""(() => {const r = recipeBank().find(x => x.nom === 'Omelette aux légumes');
+      const s = ingShares(r.code, r); return [r.kcal, s['œufs']];})()""")
+    assert 140 <= r[1] <= 170  # environ 2 œufs, et non 32 comme avant

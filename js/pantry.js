@@ -66,8 +66,8 @@ const ING_KCAL = [
   [/crevette/, 160],
   [/jambon/, 40],
   [/thon/, 130],
-  [/oeuf/, 140],
-  [/poulet|boeuf|dindon|porc|viande/, 240],
+  [/poulet|boeuf|dindon|porc|viande/, 240], // avant les œufs : « boeuf » contient « oeuf »
+  [/\boeufs?\b/, 140],
   [/sardine|maquereau|tilapia|saumon|truite|poisson/, 230],
   [/riz/, 205],
   [/pates|spaghetti|nouilles/, 200],
@@ -80,12 +80,12 @@ const ING_KCAL = [
   [/couscous|quinoa|orge|farine/, 180],
   [/manioc/, 160],
   [/flocons|avoine/, 150],
-  [/mais/, 70],
+  [/\bmais\b/, 70], // pas « maison »
   [/petits pois/, 60],
   [/yaourt/, 130],
   [/fromage|feta/, 100],
   [/lait de coco/, 50],
-  [/lait/, 80],
+  [/\blait\b/, 80], // pas « laitue »
   [/chia/, 60],
   [/amande|noix/, 85],
   [/houmous/, 100],
@@ -93,7 +93,7 @@ const ING_KCAL = [
   [/whey/, 120],
   [/flourish|melange/, 280],
   [/miel|sirop|sucre/, 20],
-  [/vinaigre|epice|ail|curry|cari|cumin|paprika|thym|cannelle|aneth|moutarde|bouillon|citron|chili/, 3],
+  [/vinaigre|epice|\bail\b|curry|\bcari\b|cumin|paprika|thym|cannelle|aneth|moutarde|bouillon|citron|chili/, 3],
 ];
 function typicalKcal(name) {
   const n = nrm(name);

@@ -2,6 +2,9 @@
 
 Format : une entrée par version publiée sur GitHub Pages. La version s'affiche dans Réglages, tout en bas.
 
+## 3.4.4 — 2026-11-16
+- Correction (#30) : les calories des ingrédients étaient mal reconnues. « Œufs » (avec Œ majuscule) comptait comme un légume (≈ 20 kcal) : retirer les œufs de l'omelette n'enlevait que ≈ 32 kcal au lieu de ≈ 150. « Bœuf » était pris pour des œufs (140 au lieu de 240), « laitue » pour du lait, « maison » pour du maïs. Un aliment refusé écrit « oeufs » bloque maintenant aussi les plats écrits « Œufs ».
+
 ## 3.4.3 — 2026-11-14
 - Quantités recalculées (#27) : quand la portion du jour n'est pas ×1, le texte du repas affiche directement les quantités ajustées (g et ml au 5 g, tasses et cuillères au ¼, pièces entières). Arrondi vers le bas pour ne pas dépasser, au plus proche si le budget est déjà au minimum ; une tasse suivie de ses grammes suit les grammes. Le menu d'origine reste affiché en petit.
 - Correction : le total « prévu » du jour déduit maintenant les ingrédients retirés ou remplacés, même avant de cocher le repas.
