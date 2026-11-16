@@ -37,10 +37,10 @@ const ALLERGY_WORDS = [
 ];
 function nrm(x) {
   return String(x || '')
+    .toLowerCase() // avant œ → oe : « Œufs » (majuscule) doit devenir « oeufs » (fiche #30)
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
-    .replace(/œ/g, 'oe')
-    .toLowerCase();
+    .replace(/œ/g, 'oe');
 }
 function momentOf(code) {
   return code[0] === 'P' ? 'P' : code[0] === 'C' ? 'C' : 'R';
