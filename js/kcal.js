@@ -32,6 +32,7 @@ function dayKcal(date, onlyDone) {
 const ZONE_MIN = 150;
 function kcalLimit() {
   const t = kcalTarget();
+  if (t !== null && goal() === 'stabiliser') return Math.max(t + 100, kcalMin() + ZONE_MIN);
   return t !== null ? Math.max(t, kcalMin() + ZONE_MIN) : Math.max(kcalMin(), num(data.settings.kcalMax, KCAL_MAX));
 }
 // mangées : fait ou partiel = la portion prévue ; remplacé = l'estimation saisie ; sauté = 0

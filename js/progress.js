@@ -70,7 +70,11 @@ function renderProgress() {
     hasW = g.n > 0,
     rate = g.real;
   if (!$('kcalSuggest')) $('progressKpis').insertAdjacentHTML('beforebegin', '<div id="kcalSuggest"></div>');
-  $('kcalSuggest').innerHTML = suggestionCard();
+  const sr = goal() === 'stabiliser' ? stabRange() : null;
+  $('kcalSuggest').innerHTML =
+    (sr
+      ? `<div class="alert info">⚖️ Objectif <b>stabiliser</b> : ta fourchette est de <b>${fr(sr[0])} à ${fr(sr[1])} kg</b>. Une pesée en dehors n’est pas grave : c’est la tendance qui compte.</div>`
+      : '') + suggestionCard();
   $('progressKpis').innerHTML = [
     kp(
       'Poids actuel',

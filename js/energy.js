@@ -125,9 +125,14 @@ function kcalSuggestion(today = todayISO()) {
   if (last && last > shiftDate(today, -21)) return null;
   const t = weightTrend(today);
   if (!t) return null;
-  const goal = weeklyLoss();
+  if (goal() === 'stabiliser') {
+    if (t.loss > 0.25) return {delta: 100, loss: t.loss, why: 'stab-down'};
+    if (t.loss < -0.25) return {delta: -100, loss: t.loss, why: 'stab-up'};
+    return null;
+  }
+  const target = weeklyLoss();
   if (t.loss > maxLoss() + 0.1) return {delta: 150, loss: t.loss, why: 'fast'};
-  if (goal > 0 && t.loss < goal - 0.2) {
+  if (target > 0 && t.loss < target - 0.2) {
     if (e.target - 100 < kcalMin() || e.adj - 100 < -ADJ_MAX) return {delta: 0, loss: t.loss, why: 'floor'};
     return {delta: -100, loss: t.loss, why: 'slow'};
   }
@@ -137,13 +142,15 @@ function suggestionCard() {
   const s = kcalSuggestion();
   if (!s) return '';
   const lost = `${s.loss >= 0 ? '−' : '+'}${fr(Math.abs(s.loss), 2)} kg par semaine`,
-    goal = `${fr(weeklyLoss(), 2)} kg visés`;
+    goalTxt = `${fr(weeklyLoss(), 2)} kg visés`;
   if (s.why === 'floor')
-    return `<div class="alert info"><b>Rythme plus lent que prévu</b> (${lost}, ${goal}). Ton budget est déjà au minimum sûr : on ne baisse pas. Ajoute de la marche, vérifie les extras et les portions, ou parles-en à une diététiste. <button data-kadj="0" style="margin-top:8px;width:100%">Compris</button></div>`;
+    return `<div class="alert info"><b>Rythme plus lent que prévu</b> (${lost}, ${goalTxt}). Ton budget est déjà au minimum sûr : on ne baisse pas. Ajoute de la marche, vérifie les extras et les portions, ou parles-en à une diététiste. <button data-kadj="0" style="margin-top:8px;width:100%">Compris</button></div>`;
   const txt =
-    s.why === 'fast'
-      ? `Tu perds plus vite que le maximum sûr (${lost}). Je propose <b>+${s.delta} kcal par jour</b>.`
-      : `Sur les 4 dernières semaines : ${lost}, pour ${goal}. Je propose <b>${s.delta} kcal par jour</b>.`;
+    s.why === 'stab-down' || s.why === 'stab-up'
+      ? `Sur les 4 dernières semaines : ${lost}, alors que tu veux stabiliser. Je propose <b>${s.delta > 0 ? '+' : ''}${s.delta} kcal par jour</b>.`
+      : s.why === 'fast'
+        ? `Tu perds plus vite que le maximum sûr (${lost}). Je propose <b>+${s.delta} kcal par jour</b>.`
+        : `Sur les 4 dernières semaines : ${lost}, pour ${goalTxt}. Je propose <b>${s.delta} kcal par jour</b>.`;
   return `<div class="alert info"><b>Ajuster mon budget ?</b> ${txt} <span class="small muted">Prochaine vérification dans 3 semaines.</span><div class="row wrap" style="margin-top:8px"><button class="primary grow" data-kadj="${s.delta}">Oui, ajuster</button><button data-kadj="0">Pas maintenant</button></div></div>`;
 }
 document.addEventListener('click', (e) => {
@@ -222,3 +229,49 @@ function scaleText(text, f, mode = 'down') {
       )
   );
 }
+
+/* ---------- Objectif « stabiliser » (fiche #34) ----------
+   Budget = besoins (pas de déficit). On suit une fourchette de ±1 kg autour d'un poids de référence :
+   le poids varie normalement de 1 à 2 kg d'un jour à l'autre (eau, sel, cycle). */
+const STAB_RANGE = 1;
+function stabWeight() {
+  return num(data.settings.stabWeight) || num(data.settings.startWeight);
+}
+function stabRange() {
+  const w = stabWeight();
+  return w ? [Math.round((w - STAB_RANGE) * 10) / 10, Math.round((w + STAB_RANGE) * 10) / 10] : null;
+}
+function switchToStabilize(w) {
+  data.profile = {...(data.profile || {}), objectif: 'stabiliser'};
+  data.settings.stabWeight = Math.round(num(w || currentWeight()) * 10) / 10;
+  data.settings.kcalAdjust = 0;
+  data.settings.kcalAdjustAt = todayISO();
+  save();
+  renderAll();
+  toast('Objectif : stabiliser ton poids.');
+}
+// En mode « perdre », poids visé atteint → proposer de stabiliser. En mode « stabiliser », hors fourchette → le dire.
+function stabBanner() {
+  const s = data.settings,
+    cur = currentWeight();
+  if (goal() === 'perdre') {
+    const tw = num(s.targetWeight);
+    if (!(tw >= 30) || !(cur > 0) || cur > tw || s.stabOfferDismissed === tw) return '';
+    return `<div class="alert">🎉 Tu as atteint ton poids visé (${fr(tw)} kg) ! On passe à l’objectif <b>stabiliser</b> : tu manges selon tes besoins et l’app surveille une fourchette de ±1 kg.<div class="row wrap" style="margin-top:8px"><button class="primary grow" data-goal-stab>Oui, stabiliser</button><button data-goal-stab-no>Continuer à perdre</button></div></div>`;
+  }
+  const r = stabRange();
+  if (!r || !(data.weights || []).length) return '';
+  if (cur > r[1])
+    return `<div class="alert">⚖️ Ton poids (${fr(cur)} kg) est au-dessus de ta fourchette (${fr(r[0])} à ${fr(r[1])} kg). Pas d’inquiétude pour une pesée : regarde la tendance sur 2 à 3 semaines.</div>`;
+  if (cur < r[0])
+    return `<div class="alert">⚖️ Ton poids (${fr(cur)} kg) est sous ta fourchette (${fr(r[0])} à ${fr(r[1])} kg). Si ça continue, mange un peu plus : l’app te proposera un ajustement.</div>`;
+  return '';
+}
+document.addEventListener('click', (e) => {
+  if (e.target.closest('[data-goal-stab]')) switchToStabilize();
+  if (e.target.closest('[data-goal-stab-no]')) {
+    data.settings.stabOfferDismissed = num(data.settings.targetWeight);
+    save();
+    renderAll();
+  }
+});
