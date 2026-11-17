@@ -28,7 +28,13 @@ function maxLoss() {
   const w = num(data.settings.startWeight);
   return Math.round(Math.min(1, w > 0 ? w * 0.01 : 0.5) * 10) / 10;
 }
+// Fiche #34 : objectif choisi à l'inscription (perdre par défaut, pour les profils existants)
+function goal() {
+  const g = prof().objectif;
+  return g === 'stabiliser' ? g : 'perdre';
+}
 function weeklyLoss() {
+  if (goal() !== 'perdre') return 0;
   return Math.min(maxLoss(), Math.max(0, num(data.settings.targetLoss, 0.5)));
 }
 // Étiquettes exclues selon la santé (en plus des allergies et refus du profil).
@@ -48,6 +54,10 @@ function ruleBanners() {
     b.push(
       `<div class="alert info">⏸️ Mode ${esc(pauseReason())}. Le compteur de calories sert seulement de repère. En cas de maladie, suis les conseils de ton médecin.</div>`,
     );
+  if (typeof stabBanner === 'function') {
+    const sb = stabBanner();
+    if (sb) b.push(sb);
+  }
   const rl = typeof realisticLoss === 'function' ? realisticLoss() : null;
   if (rl !== null && !isPaused())
     b.push(
@@ -67,9 +77,16 @@ function applyRulesToUI() {
   const card = $('feedsCard');
   if (card) card.classList.toggle('hidden', !isBreastfeeding());
   const lab = document.querySelector('label[for="targetLoss"]');
-  if (lab) lab.textContent = `Perte visée (kg/semaine, maximum ${fr(maxLoss())})`;
+  if (lab)
+    lab.textContent =
+      goal() === 'perdre'
+        ? `Perte visée (kg/semaine, maximum ${fr(maxLoss())})`
+        : 'Perte visée : sans objet (objectif « stabiliser »)';
   const tl = $('targetLoss');
-  if (tl) tl.max = String(maxLoss());
+  if (tl) {
+    tl.max = String(maxLoss());
+    tl.disabled = goal() !== 'perdre';
+  }
   const km = $('kcalMax');
   if (km) km.min = String(kcalMin());
   const kc = $('kcalCalc');

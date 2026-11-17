@@ -2,6 +2,11 @@
 
 Format : une entrée par version publiée sur GitHub Pages. La version s'affiche dans Réglages, tout en bas.
 
+## 3.5.0 — 2026-11-17
+- Objectif (#34), première question du profil : « Perdre du poids » ou « Stabiliser mon poids ». Les profils existants restent sur « Perdre ».
+- Stabiliser : budget = tes besoins (sans déficit), zone de ±100 kcal, fourchette de ±1 kg autour de ton poids de référence (affichée dans Progrès). Bandeau si le poids sort de la fourchette ; ajustement proposé (±100 kcal) si la tendance sur 4 semaines dépasse ±0,25 kg par semaine.
+- Poids visé atteint en mode « Perdre » : l'app propose de passer en « Stabiliser » (ou de continuer à perdre).
+
 ## 3.4.5 — 2026-11-17
 - iPhone (#32) : l'app restait sur un jour passé après une pause (« dimanche 15 » affiché le 17). Au retour après plus de 30 minutes ou un autre jour, elle revient toujours à aujourd'hui. Bouton « Aujourd'hui » quand on regarde un autre jour.
 - Budget au minimum (#32) : quand le calcul tombe au minimum sûr, la limite était égale au minimum (1 500 / 1 500, zone vide). La limite est maintenant au moins minimum + 150 kcal, avec un message : objectif trop rapide et rythme réaliste en kg par semaine (ou, si les besoins sont sous le minimum, la perte viendra de l'activité).

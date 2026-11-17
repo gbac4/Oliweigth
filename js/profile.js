@@ -10,6 +10,16 @@ const HEALTH = [
   ['tca', 'Antécédents de troubles alimentaires'],
 ];
 const PROFILE_FIELDS = [
+  {
+    k: 'objectif',
+    label: 'Ton objectif',
+    type: 'select',
+    def: 'perdre',
+    opts: [
+      ['perdre', 'Perdre du poids'],
+      ['stabiliser', 'Stabiliser mon poids'],
+    ],
+  },
   {k: 'prenom', label: 'Prénom', type: 'text', max: 40, req: true},
   {k: 'age', label: 'Âge', type: 'number', min: 10, max: 110, req: true},
   {
@@ -24,7 +34,16 @@ const PROFILE_FIELDS = [
   },
   {k: 'taille', label: 'Taille (cm)', type: 'number', min: 120, max: 230},
   {k: 'startWeight', label: 'Poids actuel (kg)', type: 'number', min: 30, max: 400, step: 0.1, set: true, req: true},
-  {k: 'targetWeight', label: 'Poids visé (kg)', type: 'number', min: 30, max: 400, step: 0.1, set: true},
+  {
+    k: 'targetWeight',
+    label: 'Poids visé (kg)',
+    type: 'number',
+    min: 30,
+    max: 400,
+    step: 0.1,
+    set: true,
+    show: (p) => p.objectif !== 'stabiliser',
+  },
   {
     k: 'activite',
     label: 'Activité physique',
@@ -115,14 +134,14 @@ function profileFormHTML(prefix) {
 // Cases affichées selon les réponses (allaitement seulement pour une femme, etc.)
 function refreshProfileVisibility(root) {
   const v = (k) => root.querySelector(`[data-pf="${k}"]`)?.value,
-    p = {sexe: v('sexe'), allaitement: v('allaitement') === 'oui'};
+    p = {sexe: v('sexe'), allaitement: v('allaitement') === 'oui', objectif: v('objectif')};
   PROFILE_FIELDS.filter((f) => f.show).forEach((f) =>
     root.querySelector(`[data-fk="${f.k}"]`)?.classList.toggle('hidden', !f.show(p)),
   );
 }
 document.addEventListener('change', (e) => {
   const k = e.target.dataset?.pf;
-  if (k === 'sexe' || k === 'allaitement')
+  if (k === 'sexe' || k === 'allaitement' || k === 'objectif')
     refreshProfileVisibility(e.target.closest('#obForm, #profileForm') || document);
 });
 function fieldHTML(f, prefix, p, s) {
@@ -168,7 +187,12 @@ function readProfileForm(root) {
   if (p.sexe !== 'F') Object.assign(p, {allaitement: false, grossesse: false});
   if (!p.allaitement) Object.assign(p, {bebeAge: '', allaitementType: ''});
   if (p.age !== '' && p.age < 18) errors.push('Âge : OliWeight est réservé aux adultes (18 ans et plus)');
-  if (s.targetWeight !== '' && s.startWeight !== '' && s.targetWeight >= s.startWeight)
+  if (p.objectif === 'stabiliser') {
+    s.targetWeight = '';
+    // nouvel objectif : la fourchette part du poids du moment
+    if ((data.profile || {}).objectif !== 'stabiliser')
+      s.stabWeight = (data.weights || []).length ? currentWeight() : num(s.startWeight) || currentWeight();
+  } else if (s.targetWeight !== '' && s.startWeight !== '' && s.targetWeight >= s.startWeight)
     errors.push('Poids visé : il doit être plus bas que le poids actuel');
   return {profile: p, settings: s, errors};
 }
