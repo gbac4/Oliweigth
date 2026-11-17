@@ -523,12 +523,28 @@ $('weightDate').value = todayISO();
 window.addEventListener('resize', () => {
   if ($('progress').classList.contains('active')) drawChart();
 });
-let lastToday = todayISO();
+$('goToday').addEventListener('click', () => {
+  selectedDate = todayISO();
+  renderToday();
+});
+// Fiche #32 : sur iPhone, l'app installée est mise en pause au lieu d'être fermée.
+// Au retour après plus de 30 min (ou un autre jour), on revient toujours à aujourd'hui.
+const AWAY_RESET_MS = 30 * 60 * 1000;
+let lastToday = todayISO(),
+  hiddenAt = 0;
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) hiddenAt = Date.now();
+});
+window.addEventListener('pageshow', (e) => {
+  if (e.persisted) checkDay();
+});
 function checkDay() {
-  const t = todayISO();
-  if (t !== lastToday) {
-    if (applyDueWeeks()) save();
-    if (selectedDate === lastToday) selectedDate = t;
+  const t = todayISO(),
+    away = hiddenAt && Date.now() - hiddenAt > AWAY_RESET_MS;
+  if (!document.hidden) hiddenAt = 0;
+  if (t !== lastToday || away) {
+    if (t !== lastToday && applyDueWeeks()) save();
+    selectedDate = t;
     lastToday = t;
     $('weightDate').value = t;
     renderAll();

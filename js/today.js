@@ -67,6 +67,7 @@ function renderToday() {
   $('todayLabel').textContent = fmtDate(selectedDate) + ' · ' + (s.menuLabel || '');
   $('prevDay').disabled = selectedDate <= shiftDate(t, -60);
   $('nextDay').disabled = selectedDate >= t;
+  $('goToday').classList.toggle('hidden', selectedDate === t);
   $('waterGoalLabel').textContent = num(s.waterGoal).toLocaleString('fr-FR');
   $('waterValue').textContent = num(l.water).toLocaleString('fr-FR') + ' ml';
   $('feedsDayValue').textContent = num(l.feedsDay);

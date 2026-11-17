@@ -28,8 +28,11 @@ function dayKcal(date, onlyDone) {
   }, 0);
 }
 // Budget personnalisé s'il est calculable, sinon la limite manuelle des réglages
+// Fiche #32 : au moins 150 kcal entre le minimum et la limite, sinon la zone est vide (1 500 / 1 500)
+const ZONE_MIN = 150;
 function kcalLimit() {
-  return kcalTarget() ?? Math.max(kcalMin(), num(data.settings.kcalMax, KCAL_MAX));
+  const t = kcalTarget();
+  return t !== null ? Math.max(t, kcalMin() + ZONE_MIN) : Math.max(kcalMin(), num(data.settings.kcalMax, KCAL_MAX));
 }
 // mangées : fait ou partiel = la portion prévue ; remplacé = l'estimation saisie ; sauté = 0
 function addsKcal(m) {
