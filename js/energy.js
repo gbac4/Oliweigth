@@ -44,6 +44,12 @@ function energyBreakdown() {
     target = Math.max(kcalMin(), Math.round(raw / 10) * 10);
   return {w, bmr, act, tdee, lact, maint, deficit, adj, target, floored: raw < kcalMin()};
 }
+// Perte réaliste (kg/sem) si on mange au minimum sûr : quand l'objectif demandé est trop rapide
+function realisticLoss() {
+  const e = energyBreakdown();
+  if (!e || !e.floored) return null;
+  return Math.max(0, Math.round((((e.maint - kcalMin()) * 7) / KCAL_PER_KG) * 20) / 20);
+}
 function kcalTarget() {
   const e = energyBreakdown();
   return e ? e.target : null;
@@ -58,7 +64,12 @@ function energyText() {
     e.deficit ? `− perte visée ${fmtK(e.deficit)}` : '',
     e.adj ? `${e.adj > 0 ? '+' : '−'} ajustement ${fmtK(Math.abs(e.adj))}` : '',
   ].filter(Boolean);
-  return `Calculé pour toi : ${fmtK(e.target)} kcal par jour (${parts.join(' ')}${e.floored ? ` ; remonté au minimum de ${fmtK(kcalMin())}` : ''}). Poids utilisé : ${fr(e.w)} kg, recalculé à chaque pesée.`;
+  const rl = realisticLoss(),
+    slow =
+      rl !== null
+        ? ` Ton objectif de ${fr(weeklyLoss(), 2)} kg par semaine est trop rapide pour ton profil : au minimum sûr, le rythme réaliste est d’environ ${fr(rl, 2)} kg par semaine.`
+        : '';
+  return `Calculé pour toi : ${fmtK(e.target)} kcal par jour (${parts.join(' ')}${e.floored ? ` ; remonté au minimum de ${fmtK(kcalMin())}` : ''}). Poids utilisé : ${fr(e.w)} kg, recalculé à chaque pesée.${slow}`;
 }
 /* ---------- Nombre de repas ---------- */
 function defaultMealCount() {

@@ -48,6 +48,13 @@ function ruleBanners() {
     b.push(
       `<div class="alert info">⏸️ Mode ${esc(pauseReason())}. Le compteur de calories sert seulement de repère. En cas de maladie, suis les conseils de ton médecin.</div>`,
     );
+  const rl = typeof realisticLoss === 'function' ? realisticLoss() : null;
+  if (rl !== null && !isPaused())
+    b.push(
+      rl > 0
+        ? `<div class="alert">🐢 Ton objectif de perte est trop rapide pour ton profil. En mangeant au minimum sûr (${fmtK(kcalMin())} kcal), le rythme réaliste est d’environ <b>${fr(rl, 2)} kg par semaine</b>. Tu peux baisser l’objectif dans Réglages : ce n’est pas un échec, c’est ton rythme.</div>`
+        : `<div class="alert">🐢 Ton corps dépense environ ${fmtK(energyBreakdown().maint)} kcal par jour, moins que le minimum sûr (${fmtK(kcalMin())}). On ne descend pas plus bas : la perte viendra surtout de l’activité (marche quotidienne). Parles-en à ton médecin ou à une diététiste si tu veux aller plus loin.</div>`,
+    );
   if (menusToReview())
     b.push(
       canRegenerateMenus()
