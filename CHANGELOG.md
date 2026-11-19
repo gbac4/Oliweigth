@@ -2,6 +2,12 @@
 
 Format : une entrée par version publiée sur GitHub Pages. La version s'affiche dans Réglages, tout en bas.
 
+## 3.6.0 — 2026-11-19
+- Menus (#36) : les semaines sont maintenant créées automatiquement, avec toujours 3 semaines prêtes à l'avance. Avant, les menus étaient créés une seule fois pour 5 semaines, puis la dernière semaine se répétait à l'infini.
+- Rotation avec historique : le plat le moins récemment servi passe en premier ; un plat servi dans les 3 dernières semaines (durée réglable) passe après tous les autres ; deux plats principaux de suite n'ont pas la même protéine ; les plats aimés restent favorisés à égalité. La cuisine pour 2 jours reste une répétition voulue. Les allergies et restrictions sont toujours exclues.
+- Banque élargie : 6 petits-déjeuners (gruau aux pommes, bouillie de maïs à l'arachide, tartines avocat-œuf, plantain et œufs à la tomate, bol yaourt-avoine, haricots sur pain complet) et 7 collations. Avant : 6 petits-déjeuners et 5 collations, une collation revenait tous les 2 à 3 jours.
+- Le cycle publié à la main (première utilisatrice) n'est pas touché.
+
 ## 3.5.0 — 2026-11-17
 - Objectif (#34), première question du profil : « Perdre du poids » ou « Stabiliser mon poids ». Les profils existants restent sur « Perdre ».
 - Stabiliser : budget = tes besoins (sans déficit), zone de ±100 kcal, fourchette de ±1 kg autour de ton poids de référence (affichée dans Progrès). Bandeau si le poids sort de la fourchette ; ajustement proposé (±100 kcal) si la tendance sur 4 semaines dépasse ±0,25 kg par semaine.

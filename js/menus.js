@@ -125,6 +125,11 @@ function applyDueWeeks() {
     if (w.label) data.settings.menuLabel = w.label;
     ch = true;
   }
+  // fiche #36 : ne jamais tomber à court de semaines (menus créés depuis la banque), puis appliquer celle du jour
+  if (typeof ensureFutureWeeks === 'function' && ensureFutureWeeks()) {
+    ch = true;
+    applyDueWeeks();
+  }
   return ch;
 }
 let menuTab = 'week',

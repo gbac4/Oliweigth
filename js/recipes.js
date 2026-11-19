@@ -139,7 +139,66 @@ function rotate(list, n, offset) {
   for (let i = 0; i < n && list.length; i++) out.push(list[(offset + i) % list.length]);
   return out;
 }
-function generateCycle(p, startMonday, nWeeks = 5) {
+/* Fiche #36 : rotation « le moins récemment servi ».
+   lastUsed : code → date (AAAA-MM-JJ) du dernier service connu (semaines passées, en cours et prévues).
+   Un plat servi dans la fenêtre d'historique passe après tous les autres ; à égalité, le plus anciennement servi,
+   puis le mieux noté pour le profil. Pas deux plats principaux de suite avec la même protéine. */
+const PROTEIN_OF = [
+  [/poulet|dindon/, 'volaille'],
+  [/boeuf|porc|jambon|viande/, 'viande'],
+  [/sardine|maquereau|tilapia|saumon|truite|thon|poisson|crevette|ecrevisse|hareng/, 'mer'],
+  [/oeuf|omelette/, 'oeuf'],
+  [/haricot|lentille|pois chiche|pois|tofu/, 'legumineuse'],
+];
+function proteinOf(r) {
+  const t = r.text || '';
+  return (PROTEIN_OF.find(([re]) => re.test(t)) || [null, 'autre'])[1];
+}
+function rotationWeeks() {
+  const n = num(data?.settings?.rotationWeeks);
+  return n >= 1 && n <= 8 ? n : 3;
+}
+function makePicker(list, lastUsed, p, refDate) {
+  const used = {...lastUsed},
+    windowStart = shiftDate(refDate, -7 * rotationWeeks()),
+    score = new Map(list.map((r) => [r.code, scoreRecipe(r, p)]));
+  return function pick(date, avoid = new Set(), avoidProtein = null) {
+    const key = (r) => {
+      const d = used[r.code] || '0000-00-00';
+      return [
+        avoid.has(r.code) ? 1 : 0,
+        d >= windowStart ? 1 : 0,
+        avoidProtein && proteinOf(r) === avoidProtein ? 1 : 0,
+        d,
+        -score.get(r.code),
+      ];
+    };
+    const best = [...list].sort((a, b) => {
+      const ka = key(a),
+        kb = key(b);
+      for (let i = 0; i < ka.length; i++) if (ka[i] !== kb[i]) return ka[i] < kb[i] ? -1 : 1;
+      return 0;
+    })[0];
+    if (best) used[best.code] = date;
+    return best;
+  };
+}
+// Dates de dernier service connues (historique, semaine en cours, semaines prévues)
+function lastUsedMap() {
+  const out = {},
+    put = (start, plan) =>
+      Object.entries(plan || {}).forEach(([d, codes]) =>
+        (codes || []).forEach((c) => {
+          const date = shiftDate(start, num(d) - 1);
+          if (!out[c] || out[c] < date) out[c] = date;
+        }),
+      );
+  Object.entries(data.history || {}).forEach(([start, plan]) => put(start, plan));
+  if (data.current) put(data.current.startDate, data.current.basePlan || data.plan);
+  (data.weeks || []).forEach((w) => put(w.startDate, w.basePlan || w.plan));
+  return out;
+}
+function generateCycle(p, startMonday, nWeeks = 5, lastUsed = {}) {
   const pool = compatibleRecipes(p),
     by = (m) =>
       pool
@@ -154,25 +213,38 @@ function generateCycle(p, startMonday, nWeeks = 5) {
   const Pl = fallback(P, 'P'),
     Cl = fallback(C, 'C'),
     Rl = fallback(R, 'R');
-  const twoDays = p?.deuxJours !== false;
+  const twoDays = p?.deuxJours !== false,
+    pickP = makePicker(Pl, lastUsed, p, startMonday),
+    pickC = makePicker(Cl, lastUsed, p, startMonday),
+    pickR = makePicker(Rl, lastUsed, p, startMonday);
   const weeks = [];
+  let lastProtein = null;
   for (let w = 0; w < nWeeks; w++) {
-    const nMain = twoDays ? 4 : 7,
-      main = rotate(Rl, nMain * 2, w * nMain * 2),
-      lunch = main.slice(0, nMain),
-      dinner = main.slice(nMain),
-      day = (i) => (twoDays ? [0, 0, 1, 1, 2, 2, 3][i] : i);
+    const ws = shiftDate(startMonday, w * 7),
+      nMain = twoDays ? 4 : 7,
+      day = (i) => (twoDays ? [0, 0, 1, 1, 2, 2, 3][i] : i),
+      lunch = [],
+      dinner = [],
+      inWeek = new Set();
+    // plats principaux : distincts dans la semaine, alternance des protéines (dîner puis souper de chaque bloc)
+    for (let k = 0; k < nMain; k++) {
+      const date = shiftDate(ws, twoDays ? [0, 2, 4, 6][k] : k);
+      for (const out of [lunch, dinner]) {
+        const r = pickR(date, inWeek, lastProtein);
+        inWeek.add(r.code);
+        lastProtein = proteinOf(r);
+        out.push(r);
+      }
+    }
     const plan = {};
     for (let i = 0; i < 7; i++) {
-      plan[String(i + 1)] = [
-        Pl[(w * 7 + i) % Pl.length].code,
-        Cl[(w * 7 + i) % Cl.length].code,
-        lunch[day(i) % lunch.length].code,
-        Cl[(w * 7 + i + 1) % Cl.length].code,
-        dinner[day(i) % dinner.length].code,
-      ];
+      const date = shiftDate(ws, i),
+        p0 = pickP(date),
+        c1 = pickC(date),
+        c2 = pickC(date, new Set([c1.code]));
+      plan[String(i + 1)] = [p0.code, c1.code, lunch[day(i)].code, c2.code, dinner[day(i)].code];
     }
-    weeks.push({startDate: shiftDate(startMonday, w * 7), label: `Menus semaine ${w + 1} (proposés)`, rev: 1, plan});
+    weeks.push({startDate: ws, label: `Menus semaine ${w + 1} (proposés)`, rev: 1, plan});
   }
   return weeks;
 }
@@ -184,7 +256,7 @@ function canRegenerateMenus() {
 function regenerateFromNextWeek() {
   if (!canRegenerateMenus()) return false;
   const start = shiftDate(weekStartOf(todayISO()), 7),
-    weeks = generateCycle(data.profile, start);
+    weeks = generateCycle(data.profile, start, 5, lastUsedMapBefore(start));
   recipeBank().forEach((r) => {
     if (!data.meals[r.code]) data.meals[r.code] = {nom: r.nom, details: r.details, ing: r.ing || [], kcal: r.kcal};
   });
@@ -198,6 +270,44 @@ function regenerateFromNextWeek() {
   data.meta.menusReviewedAt = new Date().toISOString();
   save();
   return true;
+}
+// Historique jusqu'à une date (exclut les semaines prévues à partir de cette date, qui vont être refaites)
+function lastUsedMapBefore(start) {
+  const keep = data.weeks;
+  data.weeks = (data.weeks || []).filter((w) => w.startDate < start);
+  const m = lastUsedMap();
+  data.weeks = keep;
+  return m;
+}
+/* Fiche #36 : semaines créées automatiquement, toujours WEEKS_AHEAD semaines prêtes à l'avance.
+   Seulement pour les menus créés depuis la banque : un cycle publié n'est jamais touché. */
+const WEEKS_AHEAD = 3;
+function ensureFutureWeeks() {
+  if (!canRegenerateMenus() || !data.current) return false;
+  let ch = false;
+  const t = todayISO();
+  for (let guard = 0; guard < 10; guard++) {
+    const future = (data.weeks || []).filter((w) => w.startDate > t).length;
+    if (future >= WEEKS_AHEAD) break;
+    const last = data.weeks.length ? data.weeks[data.weeks.length - 1].startDate : data.current.startDate,
+      // après une longue absence, on ne recrée pas les semaines passées : on repart de la semaine en cours
+      start = [shiftDate(last, 7), weekStartOf(t)].sort()[1],
+      [w] = generateCycle(data.profile, start, 1, lastUsedMap());
+    data.meta.weekNo = num(data.meta.weekNo, 5) + 1;
+    data.weeks.push({
+      ...w,
+      label: `Menus semaine ${data.meta.weekNo} (proposés)`,
+      meals: {},
+      basePlan: w.plan,
+      swaps: [],
+    });
+    ch = true;
+  }
+  if (ch)
+    recipeBank().forEach((r) => {
+      if (!data.meals[r.code]) data.meals[r.code] = {nom: r.nom, details: r.details, ing: r.ing || [], kcal: r.kcal};
+    });
+  return ch;
 }
 function regenButtonHTML() {
   return canRegenerateMenus()
