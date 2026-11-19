@@ -167,15 +167,28 @@ $('today').addEventListener('change', (e) => {
   if (!card) return;
   if (e.target.hasAttribute('data-alt')) {
     const i = card.dataset.meal,
-      l = logFor(selectedDate);
+      l = logFor(selectedDate),
+      [code, mode] = e.target.value.split('|');
     l.alt = l.alt || {};
-    ensureMeal(e.target.value);
-    if (e.target.value === planFor(selectedDate)[i]) delete l.alt[i];
-    else l.alt[i] = e.target.value;
-    if (l.meals[i]) l.meals[i].code = e.target.value;
+    ensureMeal(code);
+    if (code === planFor(selectedDate)[i]) delete l.alt[i];
+    else l.alt[i] = code;
+    // fiche #40 : recette perso, portion ajustée (fit) ou complète (full)
+    l.altMode = l.altMode || {};
+    if (mode === 'full') l.altMode[i] = 'full';
+    else delete l.altMode[i];
+    if (!Object.keys(l.altMode).length) delete l.altMode;
+    if (l.meals[i]) l.meals[i].code = code;
+    const r = computeRebalance(selectedDate);
     save();
     renderToday();
-    toast('Option changée pour aujourd’hui.');
+    toast(
+      mode === 'full' && r.extra > REBAL_TOL
+        ? `Portion complète : +${fmtK(r.extra)} kcal, repas suivants réduits${r.carried ? ` et ${fmtK(r.carried)} kcal étalés sur les jours suivants` : ''}.`
+        : mode === 'full'
+          ? 'Portion complète : l’écart est petit, rien à rééquilibrer.'
+          : 'Option changée pour aujourd’hui.',
+    );
     return;
   }
   const i = card.dataset.meal,

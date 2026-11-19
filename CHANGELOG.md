@@ -2,6 +2,10 @@
 
 Format : une entrée par version publiée sur GitHub Pages. La version s'affiche dans Réglages, tout en bas.
 
+## 3.7.0 — 2026-11-19
+- « Mes recettes » en remplacement (#40) : dans « Changer de plat », une rubrique « Mes recettes » propose toujours ses recettes du même moment, compatibles avec son profil (allergies, santé, refus). Avant, le filtre « calories proches » les cachait presque toujours.
+- Deux choix : portion ajustée aux calories du repas prévu (le total du jour ne bouge pas), ou portion complète avec rééquilibrage : sous 100 kcal d'écart, rien ne change ; au-delà, les repas pas encore notés sont réduits de 15 % au plus (quantités réécrites), les repas déjà notés ne changent jamais, et le reste est étalé sur les 3 jours suivants (100 kcal par jour au plus), jamais sous le minimum.
+
 ## 3.6.1 — 2026-11-19 (outillage)
 - Version bêta (#38) : la branche `beta` est publiée sur https://gbac4.github.io/oliweigth-beta/ pour tester avant de mettre en ligne. Données séparées de l'app normale, bandeau « BÊTA ».
 - Correction : le service worker ne supprime plus que ses propres caches (avant, il effaçait aussi ceux d'une autre app du même domaine).

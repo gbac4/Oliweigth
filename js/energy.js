@@ -85,17 +85,31 @@ function activeSlots(date) {
 }
 // Total visé du jour : budget personnalisé, sinon les 5 repas prévus (rien ne change pour l'ancien fonctionnement)
 function dayGoal(date) {
-  return kcalTarget() ?? effCodes(date).reduce((t, c) => t + kcalOf(c), 0);
+  const g = kcalTarget() ?? effCodes(date).reduce((t, c) => t + kcalOf(c), 0);
+  // fiche #40 : un excédent des jours précédents est étalé ici, sans jamais passer sous le minimum
+  const c = carryIn(date);
+  return c ? Math.max(kcalMin(), g - c) : g;
 }
 // Facteur de portion appliqué aux repas gardés pour que le jour atteigne son total (0,6 à 1,6, pas de 0,05)
 function portionFactor(date) {
-  const kept = activeSlots(date).reduce((t, i) => t + kcalOf(effCode(date, i)), 0);
+  const kept = activeSlots(date).reduce((t, i) => t + mealBaseKcal(date, i), 0);
   if (!(kept > 0)) return 1;
   const f = Math.round(clamp(dayGoal(date) / kept, 0.6, 1.6) * 20) / 20;
   return Math.abs(f - 1) < 0.05 ? 1 : f;
 }
 function slotKcal(date, i, code) {
-  return Math.round(kcalOf(code || effCode(date, i)) * portionFactor(date));
+  const c = code || effCode(date, i),
+    red = num(data.logs[date]?.rebal?.[i]);
+  if (isCustomCode(c))
+    return altMode(date, i) === 'full'
+      ? Math.round(customFullKcal(c))
+      : Math.round(plannedKcal(date, i) * portionFactor(date)) - red;
+  return Math.round(kcalOf(c) * portionFactor(date)) - red;
+}
+// facteur des quantités écrites d'un repas (portion du jour et rééquilibrage)
+function mealScale(date, i, code) {
+  const k = kcalOf(code || effCode(date, i));
+  return k > 0 ? slotKcal(date, i, code) / k : 1;
 }
 function slotShare(slot, date) {
   return SLOT_SHARES[mealCount(date || todayISO())][slot] || 0.3;
@@ -275,3 +289,88 @@ document.addEventListener('click', (e) => {
     renderAll();
   }
 });
+
+/* ---------- « Mes recettes » en remplacement et rééquilibrage (fiche #40) ----------
+   A (« fit », par défaut) : la portion de la recette est calculée pour les calories du repas prévu.
+   B (« full ») : la portion complète ; l'excédent est retiré des repas pas encore notés (15 % au plus chacun),
+   sous 100 kcal on ne fait rien, et le reste est étalé sur les 3 jours suivants (100 kcal par jour au plus).
+   Les réductions sont enregistrées au moment du choix : un repas noté ensuite ne change plus. */
+const REBAL_TOL = 100,
+  REBAL_MAX = 0.15,
+  CARRY_DAYS = 3,
+  CARRY_MAX = 100;
+function isCustomCode(c) {
+  return !!(typeof data !== 'undefined' && data.customRecipes && data.customRecipes[c]);
+}
+function altMode(date, i) {
+  return data.logs[date]?.altMode?.[i] === 'full' ? 'full' : 'fit';
+}
+function plannedKcal(date, i) {
+  return kcalOf(planFor(date)[i]);
+}
+function customFullKcal(c) {
+  return customAsMeal(c, data.customRecipes[c]).kcal;
+}
+// calories de base d'un repas avant le facteur du jour (une recette perso compte pour le repas prévu)
+function mealBaseKcal(date, i) {
+  const c = effCode(date, i);
+  return isCustomCode(c) ? plannedKcal(date, i) : kcalOf(c);
+}
+function customOptions(i) {
+  const ex = profileExclusions(data.profile);
+  return recipeBank().filter((r) => r.custom && r.moment === SLOT_MOMENT[i] && isCompatible(r, ex));
+}
+function computeRebalance(date) {
+  const l = logFor(date),
+    act = activeSlots(date),
+    pf = portionFactor(date),
+    noted = (i) => !!l.meals?.[i]?.status,
+    isFull = (i) => isCustomCode(effCode(date, i)) && altMode(date, i) === 'full';
+  let extra = act
+    .filter(isFull)
+    .reduce((t, i) => t + customFullKcal(effCode(date, i)) - Math.round(plannedKcal(date, i) * pf), 0);
+  // les réductions déjà faites sur des repas notés restent acquises
+  const out = {};
+  Object.entries(l.rebal || {}).forEach(([i, v]) => {
+    if (noted(i)) {
+      out[i] = v;
+      extra -= v;
+    }
+  });
+  let left = 0;
+  if (extra > REBAL_TOL) {
+    const rem = act.filter((i) => !noted(i) && !isFull(i) && !(i in out)),
+      base = rem.map((i) => Math.round(mealBaseKcal(date, i) * pf)),
+      total = base.reduce((a, b) => a + b, 0);
+    let todo = extra;
+    rem.forEach((i, j) => {
+      const r = total ? Math.min(Math.floor(base[j] * REBAL_MAX), Math.round((extra * base[j]) / total), todo) : 0;
+      if (r > 0) {
+        out[i] = r;
+        todo -= r;
+      }
+    });
+    left = Math.max(0, todo);
+  }
+  if (Object.keys(out).length) l.rebal = out;
+  else delete l.rebal;
+  if (left > 0) l.carryOut = Math.round(left);
+  else delete l.carryOut;
+  return {extra: Math.max(0, Math.round(extra)), carried: Math.round(left)};
+}
+// excédent reçu des jours précédents : jour J−k donne au plus 100 kcal, à partir de son reste
+function carryIn(date) {
+  let c = 0;
+  for (let k = 1; k <= CARRY_DAYS; k++) {
+    const out = num(data.logs?.[shiftDate(date, -k)]?.carryOut);
+    c += Math.max(0, Math.min(CARRY_MAX, out - CARRY_MAX * (k - 1)));
+  }
+  return c;
+}
+function customDetailsText(date, i, code) {
+  const r = data.customRecipes[code],
+    side = r.sauce ? r.side || 'taro' : '',
+    target = slotKcal(date, i, code),
+    p = portionFor(r, target, side, side ? 2 / 3 : 1);
+  return `${altMode(date, i) === 'full' ? 'Portion complète' : 'Portion ajustée au repas prévu'} (≈ ${fmtK(target)} kcal) : ${portionText(r, p, side)}.`;
+}
