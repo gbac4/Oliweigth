@@ -1,6 +1,8 @@
 // OliWeight — service worker
 // Change VERSION à chaque mise en ligne : les téléphones récupèrent alors la nouvelle version.
-const VERSION = 'oliweight-v3.6.0';
+// Seulement nos propres caches : une autre app du même domaine (la bêta) garde les siens.
+const CACHE_PREFIX = 'oliweight-v';
+const VERSION = 'oliweight-v3.6.1';
 const CORE = [
   './',
   './index.html',
@@ -40,7 +42,9 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches
       .keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k))))
+      .then((keys) =>
+        Promise.all(keys.filter((k) => k.startsWith(CACHE_PREFIX) && k !== VERSION).map((k) => caches.delete(k))),
+      )
       .then(() => self.clients.claim()),
   );
 });
