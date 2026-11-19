@@ -6,7 +6,7 @@ var SYNC_KEY = 'oliweight.sync',
   syncTimer = null,
   syncBusy = false,
   BLOCS = {1: [1, 2], 3: [3, 4], 5: [5, 6]};
-const APP_VERSION = '3.5.0';
+const APP_VERSION = '3.6.0';
 const KEY = 'oliweight.v2';
 const LEGACY_KEYS = ['oliweight.v1', 'zen.v1'];
 const REASONS = [
@@ -43,6 +43,91 @@ const SALADE = [
 ];
 // Menus semaine 1 (mêmes codes que la version 1)
 const NEW_MEALS = {
+  // Fiche #36 : banque élargie (petits-déjeuners et collations) pour varier la rotation
+  P7: {
+    nom: 'Gruau d’avoine aux pommes et amandes',
+    details:
+      '½ tasse de flocons d’avoine (40 g) cuits dans 1 tasse de lait 1 % (250 ml) + ½ pomme en dés + cannelle.\nDessus : 10 amandes concassées + 1 c. à thé de graines de chia.',
+    ing: ['F:Flocons d’avoine', 'O:Lait 1 %', 'L:Pommes', 'E:Amandes', 'E:Graines de chia'],
+    kcal: 395,
+  },
+  P8: {
+    nom: 'Bouillie de maïs au lait et arachide',
+    details:
+      '¼ de tasse de farine de maïs (30 g) cuite dans 1 tasse de lait 1 % (250 ml) + 1 c. à soupe de beurre d’arachide (16 g) + 1 c. à thé de sucre au maximum.\nAvec 1 petite banane.',
+    ing: ['F:Farine de maïs', 'O:Lait 1 %', 'E:Beurre d’arachide', 'L:Bananes'],
+    kcal: 415,
+  },
+  P9: {
+    nom: 'Tartines avocat-œuf',
+    details:
+      '2 tranches de pain complet + ¼ d’avocat écrasé + 1 œuf (poché ou dur) + tranches de tomate, sel, poivre.\nAvec 1 tasse de lait 1 % (250 ml) ou un café au lait.',
+    ing: ['F:Pain complet', 'L:Avocats', 'O:Œufs', 'L:Tomates', 'O:Lait 1 %'],
+    kcal: 405,
+  },
+  P10: {
+    nom: 'Plantain bouilli, œufs à la tomate',
+    details:
+      '½ plantain mûr bouilli (90 g) + 2 œufs brouillés dans une sauce tomate-oignon (1 c. à thé d’huile) + ¼ d’avocat.\nAvec 1 orange.',
+    ing: ['F:Plantains', 'O:Œufs', 'L:Tomates', 'L:Oignons', 'E:Huile végétale', 'L:Avocats', 'L:Oranges'],
+    kcal: 430,
+  },
+  P11: {
+    nom: 'Bol yaourt grec, avoine et petits fruits',
+    details:
+      '¾ de tasse de yaourt grec nature 0 % (175 g) + ¼ de tasse de flocons d’avoine grillés à sec (20 g) + ½ tasse de petits fruits + 1 c. à thé de miel.\nAvec 1 œuf dur.',
+    ing: ['O:Yaourt grec nature', 'F:Flocons d’avoine', 'L:Petits fruits surgelés', 'E:Miel', 'O:Œufs'],
+    kcal: 400,
+  },
+  P12: {
+    nom: 'Haricots à la tomate sur pain complet',
+    details:
+      '¾ de tasse de haricots rouges cuits (130 g) mijotés avec tomate, oignon et épices (1 c. à thé d’huile) sur 1 tranche de pain complet grillée.\nAvec 1 œuf et des crudités.',
+    ing: ['F:Haricots rouges', 'L:Tomates', 'L:Oignons', 'E:Huile végétale', 'F:Pain complet', 'O:Œufs'],
+    kcal: 405,
+  },
+  C6: {
+    nom: 'Pomme + beurre d’arachide',
+    details: '1 pomme moyenne en quartiers + 1 c. à soupe de beurre d’arachide naturel (16 g).',
+    ing: ['L:Pommes', 'E:Beurre d’arachide'],
+    kcal: 190,
+  },
+  C7: {
+    nom: 'Arachides grillées',
+    details: '1 petite poignée d’arachides grillées non salées (30 g, environ 30 arachides) + un grand verre d’eau.',
+    ing: ['E:Arachides grillées'],
+    kcal: 170,
+  },
+  C8: {
+    nom: 'Yaourt grec et petits fruits',
+    details: '¾ de tasse de yaourt grec nature 0 % (175 g) + ½ tasse de petits fruits + 1 c. à thé de miel au maximum.',
+    ing: ['O:Yaourt grec nature', 'L:Petits fruits surgelés', 'E:Miel'],
+    kcal: 160,
+  },
+  C9: {
+    nom: 'Œuf dur + fruit',
+    details: '1 œuf dur + 1 fruit entier (pomme, orange, poire…).',
+    ing: ['O:Œufs', 'L:Fruits'],
+    kcal: 150,
+  },
+  C10: {
+    nom: 'Houmous et crudités',
+    details: '3 c. à soupe de houmous (45 g) + bâtonnets de carotte et de concombre + 2 biscottes complètes.',
+    ing: ['E:Houmous', 'L:Carottes', 'L:Concombre', 'F:Biscottes complètes'],
+    kcal: 175,
+  },
+  C11: {
+    nom: 'Lait + banane',
+    details: '1 tasse de lait 1 % (250 ml) + 1 petite banane.',
+    ing: ['O:Lait 1 %', 'L:Bananes'],
+    kcal: 195,
+  },
+  C12: {
+    nom: 'Fromage et craquelins',
+    details: '30 g de fromage (2 dés) + 4 craquelins de grains entiers + quelques tomates cerises.',
+    ing: ['O:Fromage', 'F:Craquelins de grains entiers', 'L:Tomates'],
+    kcal: 190,
+  },
   P6: {
     nom: 'Crêpes protéinées Flourish',
     details:
