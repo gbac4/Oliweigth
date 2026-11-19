@@ -101,8 +101,8 @@ function slotKcal(date, i, code) {
   const c = code || effCode(date, i),
     red = num(data.logs[date]?.rebal?.[i]);
   if (isCustomCode(c))
-    return altMode(date, i) === 'full'
-      ? Math.round(customFullKcal(c))
+    return altMode(date, i) !== 'fit'
+      ? partsKcal(c, altParts(date, i))
       : Math.round(plannedKcal(date, i) * portionFactor(date)) - red;
   return Math.round(kcalOf(c) * portionFactor(date)) - red;
 }
@@ -302,14 +302,33 @@ const REBAL_TOL = 100,
 function isCustomCode(c) {
   return !!(typeof data !== 'undefined' && data.customRecipes && data.customRecipes[c]);
 }
+// « fit » (portion ajustée) ou un nombre de parts de la marmite : « p0.5 », « p1 », « p1.5 », « p2 »
+const PARTS_CHOICES = [0.5, 1, 1.5, 2];
 function altMode(date, i) {
-  return data.logs[date]?.altMode?.[i] === 'full' ? 'full' : 'fit';
+  const m = data.logs[date]?.altMode?.[i];
+  return m === 'full' ? 'p1' : /^p[\d.]+$/.test(m || '') ? m : 'fit';
+}
+function altParts(date, i) {
+  return num(altMode(date, i).slice(1)) || 1;
+}
+function partsLabel(n) {
+  return `${n === 0.5 ? '½' : n === 1.5 ? '1 ½' : String(n)} part${n > 1 ? 's' : ''}`;
+}
+// n parts de la marmite (nombre de parts de la recette) + l'accompagnement habituel, une seule fois
+function partsKcal(c, n) {
+  const r = data.customRecipes[c],
+    t = recipeTotals(r),
+    side = r.sauce ? FOODS[r.side || 'taro'] : null,
+    sideK = side ? (side.units[1][1] * side.kcal) / 100 : 0,
+    // sans nombre de parts (seulement le poids cuit), une part = la portion standard de sauce
+    part = t.perPart > 0 ? t.perPart : customAsMeal(c, r).kcal * (r.sauce ? 2 / 3 : 1);
+  return Math.round(n * part + sideK);
 }
 function plannedKcal(date, i) {
   return kcalOf(planFor(date)[i]);
 }
 function customFullKcal(c) {
-  return customAsMeal(c, data.customRecipes[c]).kcal;
+  return partsKcal(c, 1);
 }
 // calories de base d'un repas avant le facteur du jour (une recette perso compte pour le repas prévu)
 function mealBaseKcal(date, i) {
@@ -320,15 +339,19 @@ function customOptions(i) {
   const ex = profileExclusions(data.profile);
   return recipeBank().filter((r) => r.custom && r.moment === SLOT_MOMENT[i] && isCompatible(r, ex));
 }
+/* Ordre de compensation (fiche #40, décidé avec Bertrand) :
+   1. sous 100 kcal, rien ; 2. s'il reste une collation, proposer de la sauter (ou de la réduire de moitié ;
+   en allaitement, seulement réduire) ; 3. repas principaux restants −15 % au plus ; 4. étalement sur 3 jours,
+   100 kcal par jour au plus ; 5. le reste est affiché, pas compensé. Jamais de repas principal sauté. */
 function computeRebalance(date) {
   const l = logFor(date),
     act = activeSlots(date),
     pf = portionFactor(date),
     noted = (i) => !!l.meals?.[i]?.status,
-    isFull = (i) => isCustomCode(effCode(date, i)) && altMode(date, i) === 'full';
+    isFull = (i) => isCustomCode(effCode(date, i)) && altMode(date, i) !== 'fit';
   let extra = act
     .filter(isFull)
-    .reduce((t, i) => t + customFullKcal(effCode(date, i)) - Math.round(plannedKcal(date, i) * pf), 0);
+    .reduce((t, i) => t + partsKcal(effCode(date, i), altParts(date, i)) - Math.round(plannedKcal(date, i) * pf), 0);
   // les réductions déjà faites sur des repas notés restent acquises
   const out = {};
   Object.entries(l.rebal || {}).forEach(([i, v]) => {
@@ -338,8 +361,26 @@ function computeRebalance(date) {
     }
   });
   let left = 0;
+  delete l.snackOffer;
   if (extra > REBAL_TOL) {
-    const rem = act.filter((i) => !noted(i) && !isFull(i) && !(i in out)),
+    // collations restantes : selon le choix de la personne
+    const deals = l.snackDeal || {};
+    act
+      .filter((i) => SLOT_MOMENT[i] === 'C' && !noted(i) && !isFull(i) && !(i in out))
+      .forEach((i) => {
+        const k = Math.round(mealBaseKcal(date, i) * pf),
+          d = deals[i];
+        if (d === 'skip' || d === 'half') {
+          const r = Math.min(extra, d === 'skip' ? k : Math.floor(k / 2));
+          if (r > 0) {
+            out[i] = r;
+            extra -= r;
+          }
+        } else if (!d && l.snackOffer === undefined && extra > REBAL_TOL) l.snackOffer = i;
+      });
+  }
+  if (extra > REBAL_TOL) {
+    const rem = act.filter((i) => SLOT_MOMENT[i] !== 'C' && !noted(i) && !isFull(i) && !(i in out)),
       base = rem.map((i) => Math.round(mealBaseKcal(date, i) * pf)),
       total = base.reduce((a, b) => a + b, 0);
     let todo = extra;
@@ -356,7 +397,13 @@ function computeRebalance(date) {
   else delete l.rebal;
   if (left > 0) l.carryOut = Math.round(left);
   else delete l.carryOut;
-  return {extra: Math.max(0, Math.round(extra)), carried: Math.round(left)};
+  const cap = CARRY_DAYS * CARRY_MAX;
+  return {
+    extra: Math.max(0, Math.round(extra)),
+    carried: Math.round(Math.min(left, cap)),
+    lost: Math.round(Math.max(0, left - cap)),
+    offer: l.snackOffer,
+  };
 }
 // excédent reçu des jours précédents : jour J−k donne au plus 100 kcal, à partir de son reste
 function carryIn(date) {
@@ -370,7 +417,48 @@ function carryIn(date) {
 function customDetailsText(date, i, code) {
   const r = data.customRecipes[code],
     side = r.sauce ? r.side || 'taro' : '',
-    target = slotKcal(date, i, code),
-    p = portionFor(r, target, side, side ? 2 / 3 : 1);
-  return `${altMode(date, i) === 'full' ? 'Portion complète' : 'Portion ajustée au repas prévu'} (≈ ${fmtK(target)} kcal) : ${portionText(r, p, side)}.`;
+    target = slotKcal(date, i, code);
+  if (altMode(date, i) !== 'fit') {
+    const n = altParts(date, i),
+      sf = side ? FOODS[side] : null,
+      name = r.nom.split(' (')[0].toLowerCase(),
+      parts = num(r.parts),
+      sauce =
+        parts > 0
+          ? `${partsLabel(n)} de ${name} (${Number.isInteger(n) ? n : String(n).replace('.', ',')}/${parts} de la marmite)`
+          : `${partsLabel(n)} de ${name}`;
+    return `${sauce}${sf ? ` + ${sf.units[1][1]} g de ${sf.nom.toLowerCase()} (${sf.units[1][0]})` : ''} : ≈ ${fmtK(target)} kcal.`;
+  }
+  const p = portionFor(r, target, side, side ? 2 / 3 : 1);
+  return `Portion ajustée au repas prévu (≈ ${fmtK(target)} kcal) : ${portionText(r, p, side)}.`;
 }
+// non compensé ce jour-là (au-delà de ce que les 3 jours suivants absorbent)
+function uncompensated(date) {
+  return Math.max(0, num(data.logs[date]?.carryOut) - CARRY_DAYS * CARRY_MAX);
+}
+function snackOfferHTML(date) {
+  const l = data.logs[date],
+    i = l?.snackOffer;
+  if (i === undefined || i === null) return '';
+  const k = Math.round(mealBaseKcal(date, i) * portionFactor(date)),
+    name = SLOTS[i].split(' · ')[0].toLowerCase();
+  return `<div class="alert info" data-snack-offer>⚖️ Ton repas dépasse le prévu. Tu peux alléger ta <b>${esc(name)}</b> (≈ ${fmtK(k)} kcal) pour rester dans ta journée.${isBreastfeeding() ? ' Pendant l’allaitement, on la réduit sans la supprimer.' : ''}<div class="row wrap" style="margin-top:8px">${isBreastfeeding() ? '' : `<button type="button" data-snack="skip">La sauter (−${fmtK(k)})</button>`}<button type="button" data-snack="half">La réduire de moitié (−${fmtK(Math.floor(k / 2))})</button><button type="button" data-snack="no">Non, je la garde</button></div></div>`;
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-snack]');
+  if (!b) return;
+  const l = logFor(selectedDate),
+    i = l.snackOffer;
+  if (i === undefined) return;
+  l.snackDeal = {...(l.snackDeal || {}), [i]: b.dataset.snack};
+  const r = computeRebalance(selectedDate);
+  save();
+  renderToday();
+  toast(
+    r.lost
+      ? `${fmtK(r.lost)} kcal ne peuvent pas être compensés : ce n’est pas grave une fois, c’est la semaine qui compte.`
+      : r.carried
+        ? `${fmtK(r.carried)} kcal seront étalés sur les jours suivants.`
+        : 'Ta journée est rééquilibrée.',
+  );
+});

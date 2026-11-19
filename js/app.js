@@ -175,7 +175,7 @@ $('today').addEventListener('change', (e) => {
     else l.alt[i] = code;
     // fiche #40 : recette perso, portion ajustée (fit) ou complète (full)
     l.altMode = l.altMode || {};
-    if (mode === 'full') l.altMode[i] = 'full';
+    if (mode && mode !== 'fit') l.altMode[i] = mode;
     else delete l.altMode[i];
     if (!Object.keys(l.altMode).length) delete l.altMode;
     if (l.meals[i]) l.meals[i].code = code;
@@ -183,11 +183,13 @@ $('today').addEventListener('change', (e) => {
     save();
     renderToday();
     toast(
-      mode === 'full' && r.extra > REBAL_TOL
-        ? `Portion complète : +${fmtK(r.extra)} kcal, repas suivants réduits${r.carried ? ` et ${fmtK(r.carried)} kcal étalés sur les jours suivants` : ''}.`
-        : mode === 'full'
-          ? 'Portion complète : l’écart est petit, rien à rééquilibrer.'
-          : 'Option changée pour aujourd’hui.',
+      mode && mode !== 'fit' && r.offer !== undefined
+        ? `+${fmtK(r.extra)} kcal : regarde la proposition pour ta collation.`
+        : mode && mode !== 'fit' && r.extra > REBAL_TOL
+          ? `+${fmtK(r.extra)} kcal : repas suivants allégés${r.carried ? `, ${fmtK(r.carried)} kcal étalés sur les jours suivants` : ''}${r.lost ? `, ${fmtK(r.lost)} kcal non compensés` : ''}.`
+          : mode && mode !== 'fit'
+            ? 'L’écart est petit : rien à rééquilibrer.'
+            : 'Option changée pour aujourd’hui.',
     );
     return;
   }

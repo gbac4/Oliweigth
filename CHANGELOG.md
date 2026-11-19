@@ -4,7 +4,9 @@ Format : une entrée par version publiée sur GitHub Pages. La version s'affiche
 
 ## 3.7.0 — 2026-11-19
 - « Mes recettes » en remplacement (#40) : dans « Changer de plat », une rubrique « Mes recettes » propose toujours ses recettes du même moment, compatibles avec son profil (allergies, santé, refus). Avant, le filtre « calories proches » les cachait presque toujours.
-- Deux choix : portion ajustée aux calories du repas prévu (le total du jour ne bouge pas), ou portion complète avec rééquilibrage : sous 100 kcal d'écart, rien ne change ; au-delà, les repas pas encore notés sont réduits de 15 % au plus (quantités réécrites), les repas déjà notés ne changent jamais, et le reste est étalé sur les 3 jours suivants (100 kcal par jour au plus), jamais sous le minimum.
+- Choix de la portion : « portion ajustée » aux calories du repas prévu (le total du jour ne bouge pas), ou ½, 1, 1 ½ ou 2 parts de sa marmite (accompagnement habituel compté une fois).
+- Rééquilibrage, dans l'ordre : sous 100 kcal d'écart, rien ; s'il reste une collation, l'app propose de la sauter ou de la réduire de moitié (en allaitement, seulement la réduire) ; puis les repas principaux pas encore notés sont allégés de 15 % au plus ; puis étalement sur les 3 jours suivants (100 kcal par jour au plus, jamais sous le minimum) ; le reste est affiché comme non compensé. Jamais de repas principal sauté, jamais de repas déjà noté modifié.
+- Retrait du bouton de démonstration « Partir du kpwem standard » dans « Créer ma recette ».
 
 ## 3.6.1 — 2026-11-19 (outillage)
 - Version bêta (#38) : la branche `beta` est publiée sur https://gbac4.github.io/oliweigth-beta/ pour tester avant de mettre en ligne. Données séparées de l'app normale, bandeau « BÊTA ».
