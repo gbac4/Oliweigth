@@ -1,0 +1,49 @@
+# Publie la branche « beta » sur https://gbac4.github.io/oliweigth-beta/ pour tester avant main.
+# L'app bêta est sur le même domaine que l'app normale : ses données sont séparées (clés, photos, caches).
+# Ne jamais la relier au repo de données d'une vraie utilisatrice.
+name: Version bêta
+on:
+  push:
+    branches: [beta]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Construire la version bêta
+        run: |
+          mkdir site
+          cp -r index.html manifest.webmanifest sw.js icon-192.png icon-512.png css js site/
+          cd site
+          # données séparées de l'app normale (même domaine gbac4.github.io)
+          sed -i "s/'oliweight\.v2'/'oliweight-beta.v2'/; s/'oliweight\.sync'/'oliweight-beta.sync'/" js/config.js
+          sed -i "s/const LEGACY_KEYS = \[[^]]*\]/const LEGACY_KEYS = []/" js/config.js
+          sed -i "s/'oliweight-photos'/'oliweight-beta-photos'/" js/photos.js
+          sed -i "s/'oliweight-v/'oliweight-beta-v/g" sw.js
+          sed -i 's/"short_name": "OliWeight"/"short_name": "OliWeight β"/; s/"name": "OliWeight/"name": "OliWeight BÊTA/; s/"theme_color": "#176b55"/"theme_color": "#b45309"/' manifest.webmanifest
+          sed -i 's#<title>OliWeight</title>#<title>OliWeight BÊTA</title>#' index.html
+          sed -i 's#<body>#<body><div style="position:sticky;top:0;z-index:999;background:\#b45309;color:\#fff;text-align:center;font:600 13px system-ui;padding:4px">BÊTA – version de test, données fictives seulement</div>#' index.html
+          # garde-fou : aucune clé de l'app normale ne doit rester
+          ! grep -n "'oliweight\.v2'\|'oliweight\.sync'\|'oliweight\.v1'\|'zen\.v1'" js/config.js
+          ! grep -n "'oliweight-photos'" js/photos.js
+          ! grep -n "'oliweight-v" sw.js
+          grep -q "oliweight-beta.v2" js/config.js
+      - name: Publier sur oliweigth-beta
+        env:
+          BETA_TOKEN: ${{ secrets.BETA_TOKEN }}
+        run: |
+          cd site
+          git init -q -b main
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Bêta depuis ${GITHUB_SHA::7}"
+          git push -q --force "https://x-access-token:${BETA_TOKEN}@github.com/gbac4/oliweigth-beta.git" main
+      - name: Activer GitHub Pages (première fois)
+        env:
+          GH_TOKEN: ${{ secrets.BETA_TOKEN }}
+        run: |
+          gh api repos/gbac4/oliweigth-beta/pages -X POST -f "source[branch]=main" -f "source[path]=/" || echo "Pages déjà activé"

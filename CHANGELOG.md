@@ -2,6 +2,10 @@
 
 Format : une entrée par version publiée sur GitHub Pages. La version s'affiche dans Réglages, tout en bas.
 
+## 3.6.1 — 2026-11-19 (outillage)
+- Version bêta (#38) : la branche `beta` est publiée sur https://gbac4.github.io/oliweigth-beta/ pour tester avant de mettre en ligne. Données séparées de l'app normale, bandeau « BÊTA ».
+- Correction : le service worker ne supprime plus que ses propres caches (avant, il effaçait aussi ceux d'une autre app du même domaine).
+
 ## 3.6.0 — 2026-11-19
 - Menus (#36) : les semaines sont maintenant créées automatiquement, avec toujours 3 semaines prêtes à l'avance. Avant, les menus étaient créés une seule fois pour 5 semaines, puis la dernière semaine se répétait à l'infini.
 - Rotation avec historique : le plat le moins récemment servi passe en premier ; un plat servi dans les 3 dernières semaines (durée réglable) passe après tous les autres ; deux plats principaux de suite n'ont pas la même protéine ; les plats aimés restent favorisés à égalité. La cuisine pour 2 jours reste une répétition voulue. Les allergies et restrictions sont toujours exclues.
