@@ -20,6 +20,8 @@ function renderSettings() {
     ? 'Dernière sauvegarde : ' + new Date(lb).toLocaleDateString('fr-FR', {day: 'numeric', month: 'long'})
     : 'Aucune sauvegarde pour l’instant.';
   $('appVersion').textContent = 'Version ' + APP_VERSION + '.';
+  const nErr = diagRead().length;
+  $('diagInfo').textContent = nErr ? nErr + ' erreur(s) enregistrée(s).' : 'Aucune erreur enregistrée.';
   if (typeof renderSync === 'function' && $('syncOwner')) renderSync();
   renderProfileCard();
   applyRulesToUI();
