@@ -1,0 +1,8 @@
+{
+  "name": "oliweight-tools",
+  "private": true,
+  "type": "module",
+  "description": "Outils de contrôle du code (non livrés dans l'app)",
+  "scripts": {"lint": "cd .. && node tools/lint.mjs"},
+  "devDependencies": {"eslint": "9.39.5", "espree": "10.4.0", "globals": "15.15.0"}
+}

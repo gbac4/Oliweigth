@@ -2,6 +2,10 @@
 
 Format : une entrée par version publiée sur GitHub Pages. La version s'affiche dans Réglages, tout en bas.
 
+## 3.6.2 — 2026-11-20 (outillage)
+- Contrôle du code (ESLint) dans la CI : une PR est bloquée si un nom est déclaré deux fois dans deux fichiers (comme `SLOT_MOMENT`) ou si un nom est mal tapé. Outil hors de l'app (`tools/`), rien de plus à télécharger sur le téléphone.
+- Réglages › « 🩺 Un problème ? » : l'app garde ses 20 dernières erreurs techniques (version, écran, fichier et ligne, message). Le bouton « Copier le diagnostic » les copie pour les envoyer à Bertrand. Aucun poids, repas ni profil dedans.
+
 ## 3.6.1 — 2026-11-19 (outillage)
 - Version bêta (#38) : la branche `beta` est publiée sur https://gbac4.github.io/oliweigth-beta/ pour tester avant de mettre en ligne. Données séparées de l'app normale, bandeau « BÊTA ».
 - Correction : le service worker ne supprime plus que ses propres caches (avant, il effaçait aussi ceux d'une autre app du même domaine).

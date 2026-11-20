@@ -14,6 +14,8 @@ jobs:
         with: { node-version: "22" }
       - name: Syntaxe JS
         run: for f in js/*.js sw.js; do node --check "$f"; done
+      - name: Contrôle du code (ESLint)
+        run: cd tools && npm ci --no-audit --no-fund && npm run lint
       - name: Formatage (prettier)
         run: npx --yes prettier@3 --print-width 120 --single-quote --no-bracket-spacing --check "js/*.js" sw.js css/app.css
       - name: Dépendances de test
