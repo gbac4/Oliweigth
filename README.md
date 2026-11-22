@@ -12,6 +12,7 @@ Version en ligne : GitHub Pages de ce repo. La version installée s'affiche dans
 | `SECURITY.md` | données, où elles vont, règles de sécurité, incident |
 | `docs/RUNBOOK.md` | procédures : publier, ajouter un testeur, incident, clé, retour arrière |
 | `docs/RISQUES.md` | registre des risques |
+| `docs/REFERENCES.md` | sources de chaque calcul ; chiffres officiels et choix à valider |
 | `docs/DECISIONS.md` | décisions et leurs raisons |
 | `docs/CONSENTEMENT-modele.md` | accord des testeurs (modèle vide) |
 | `CHANGELOG.md` | journal des versions |
