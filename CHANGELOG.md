@@ -2,6 +2,10 @@
 
 Format : une entrée par version publiée sur GitHub Pages. La version s'affiche dans Réglages, tout en bas.
 
+## 3.6.3 — 2026-11-22 (corrections)
+- Bas de l'écran Aujourd'hui : la phrase sur l'allaitement ne s'affiche plus que si le profil allaite (retour d'une testeuse qui n'allaite pas).
+- Ajouts rapides (+ Huile, + Sucre/miel…) : chaque ajout se retire seul en le touchant. Avant, seul « Annuler le dernier » existait : pour retirer le premier, il fallait tout défaire.
+
 ## 3.6.1 — 2026-11-19 (outillage)
 - Version bêta (#38) : la branche `beta` est publiée sur https://gbac4.github.io/oliweigth-beta/ pour tester avant de mettre en ligne. Données séparées de l'app normale, bandeau « BÊTA ».
 - Correction : le service worker ne supprime plus que ses propres caches (avant, il effaçait aussi ceux d'une autre app du même domaine).

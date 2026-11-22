@@ -113,14 +113,16 @@ $('today').addEventListener('click', (e) => {
     toast(`${lab} : +${k} kcal`);
     return;
   }
-  const au = e.target.closest('[data-add-undo]');
-  if (au) {
-    const i = au.closest('[data-meal]').dataset.meal,
-      m = logFor(selectedDate).meals[i];
-    if (m?.adds?.length) {
-      m.adds.pop();
+  const ax = e.target.closest('[data-add-del]');
+  if (ax) {
+    const i = ax.closest('[data-meal]').dataset.meal,
+      m = logFor(selectedDate).meals[i],
+      j = Number(ax.dataset.addDel);
+    if (m?.adds?.[j]) {
+      const [gone] = m.adds.splice(j, 1);
       save();
       renderToday();
+      toast(`${gone.label} retiré.`);
     }
     return;
   }

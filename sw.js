@@ -2,7 +2,7 @@
 // Change VERSION à chaque mise en ligne : les téléphones récupèrent alors la nouvelle version.
 // Seulement nos propres caches : une autre app du même domaine (la bêta) garde les siens.
 const CACHE_PREFIX = 'oliweight-v';
-const VERSION = 'oliweight-v3.6.1';
+const VERSION = 'oliweight-v3.6.3';
 const CORE = [
   './',
   './index.html',
