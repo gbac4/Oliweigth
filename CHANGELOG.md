@@ -2,6 +2,10 @@
 
 Format : une entrée par version publiée sur GitHub Pages. La version s'affiche dans Réglages, tout en bas.
 
+## 3.7.2 — 2026-11-22 (corrections)
+- Bas de l'écran Aujourd'hui : la phrase sur l'allaitement ne s'affiche plus que si le profil allaite (retour d'une testeuse qui n'allaite pas).
+- Ajouts rapides (+ Huile, + Sucre/miel…) : chaque ajout se retire seul en le touchant. Avant, seul « Annuler le dernier » existait : pour retirer le premier, il fallait tout défaire.
+
 ## 3.7.1 — 2026-11-20 (outillage)
 - Contrôle du code (ESLint) dans la CI : une PR est bloquée si un nom est déclaré deux fois dans deux fichiers (comme `SLOT_MOMENT`) ou si un nom est mal tapé. Outil hors de l'app (`tools/`), rien de plus à télécharger sur le téléphone.
 - Réglages › « 🩺 Un problème ? » : l'app garde ses 20 dernières erreurs techniques (version, écran, fichier et ligne, message). Le bouton « Copier le diagnostic » les copie pour les envoyer à Bertrand. Aucun poids, repas ni profil dedans.
