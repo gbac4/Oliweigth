@@ -2,6 +2,10 @@
 
 Format : une entrée par version publiée sur GitHub Pages. La version s'affiche dans Réglages, tout en bas.
 
+## 3.7.1 — 2026-11-20 (outillage)
+- Contrôle du code (ESLint) dans la CI : une PR est bloquée si un nom est déclaré deux fois dans deux fichiers (comme `SLOT_MOMENT`) ou si un nom est mal tapé. Outil hors de l'app (`tools/`), rien de plus à télécharger sur le téléphone.
+- Réglages › « 🩺 Un problème ? » : l'app garde ses 20 dernières erreurs techniques (version, écran, fichier et ligne, message). Le bouton « Copier le diagnostic » les copie pour les envoyer à Bertrand. Aucun poids, repas ni profil dedans.
+
 ## 3.7.0 — 2026-11-19
 - « Mes recettes » en remplacement (#40) : dans « Changer de plat », une rubrique « Mes recettes » propose toujours ses recettes du même moment, compatibles avec son profil (allergies, santé, refus). Avant, le filtre « calories proches » les cachait presque toujours.
 - Choix de la portion : « portion ajustée » aux calories du repas prévu (le total du jour ne bouge pas), ou ½, 1, 1 ½ ou 2 parts de sa marmite (accompagnement habituel compté une fois).

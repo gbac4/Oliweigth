@@ -520,6 +520,21 @@ $('importMenu').addEventListener('click', async () => {
     toast('Fichier de menus invalide : ' + e.message);
   }
 });
+$('diagCopy').addEventListener('click', async () => {
+  const t = diagText();
+  try {
+    await navigator.clipboard.writeText(t);
+    toast('Diagnostic copié : colle-le dans un message à Bertrand.');
+  } catch (e) {
+    download('oliweight-diagnostic.txt', t, 'text/plain;charset=utf-8');
+    toast('Diagnostic téléchargé (copie impossible).');
+  }
+});
+$('diagClear').addEventListener('click', () => {
+  diagClear();
+  renderSettings();
+  toast('Journal vidé.');
+});
 $('clearData').addEventListener('click', () => {
   if (
     confirm('Effacer définitivement toutes les données OliWeight de ce téléphone ?') &&
