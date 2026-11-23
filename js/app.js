@@ -167,15 +167,30 @@ $('today').addEventListener('change', (e) => {
   if (!card) return;
   if (e.target.hasAttribute('data-alt')) {
     const i = card.dataset.meal,
-      l = logFor(selectedDate);
+      l = logFor(selectedDate),
+      [code, mode] = e.target.value.split('|');
     l.alt = l.alt || {};
-    ensureMeal(e.target.value);
-    if (e.target.value === planFor(selectedDate)[i]) delete l.alt[i];
-    else l.alt[i] = e.target.value;
-    if (l.meals[i]) l.meals[i].code = e.target.value;
+    ensureMeal(code);
+    if (code === planFor(selectedDate)[i]) delete l.alt[i];
+    else l.alt[i] = code;
+    // fiche #40 : recette perso, portion ajustée (fit) ou complète (full)
+    l.altMode = l.altMode || {};
+    if (mode && mode !== 'fit') l.altMode[i] = mode;
+    else delete l.altMode[i];
+    if (!Object.keys(l.altMode).length) delete l.altMode;
+    if (l.meals[i]) l.meals[i].code = code;
+    const r = computeRebalance(selectedDate);
     save();
     renderToday();
-    toast('Option changée pour aujourd’hui.');
+    toast(
+      mode && mode !== 'fit' && r.offer !== undefined
+        ? `+${fmtK(r.extra)} kcal : regarde la proposition pour ta collation.`
+        : mode && mode !== 'fit' && r.extra > REBAL_TOL
+          ? `+${fmtK(r.extra)} kcal : repas suivants allégés${r.carried ? `, ${fmtK(r.carried)} kcal étalés sur les jours suivants` : ''}${r.lost ? `, ${fmtK(r.lost)} kcal non compensés` : ''}.`
+          : mode && mode !== 'fit'
+            ? 'L’écart est petit : rien à rééquilibrer.'
+            : 'Option changée pour aujourd’hui.',
+    );
     return;
   }
   const i = card.dataset.meal,
