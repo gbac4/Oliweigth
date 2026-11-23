@@ -110,6 +110,7 @@
  <div class="card"><h2>Alarmes du soir</h2><p class="small muted">Chaque bouton crée une alarme quotidienne dans Google Agenda : ouvre le fichier avec Agenda.</p><button id="icsExport" style="width:100%">📝 Rappel « noter ma journée »</button><button id="icsCutoff" style="width:100%;margin-top:8px">🌙 Alarme « cuisine fermée »</button></div>
  <div class="card"><h2>Nouveaux menus</h2><p class="small muted">Ouvre le fichier .json que Bertrand t’envoie chaque semaine.</p><div class="field"><label for="menuImport">Fichier de menus</label><input id="menuImport" type="file" accept=".json,application/json"></div><button id="importMenu" style="width:100%">Importer les menus</button></div>
  <div class="card"><h2>Sauvegarde</h2><p class="small muted" id="backupInfo"></p><div class="row wrap"><button id="jsonExport">💾 Sauvegarder mes données</button><button id="csvExport">Exporter CSV</button></div><div class="field"><label for="jsonImport">Restaurer une sauvegarde</label><input id="jsonImport" type="file" accept=".json,application/json"></div><button id="restoreJson">Restaurer</button></div>
+ <div class="card"><h2>🩺 Un problème ?</h2><p class="small muted">Si l’app se comporte bizarrement, copie le diagnostic et envoie-le à Bertrand. Il contient seulement des informations techniques (version, téléphone, erreurs), jamais ton poids, tes repas ni ton profil.</p><p class="small" id="diagInfo"></p><div class="row wrap"><button class="grow" id="diagCopy">📋 Copier le diagnostic</button><button id="diagClear">Vider</button></div></div>
  <div class="card"><h2>Effacer les données</h2><p class="small muted">Supprime les journaux, pesées et réglages de ce téléphone.</p><button class="danger" id="clearData">Effacer toutes les données</button></div>
  <p class="footer-note">Les données restent sur ce téléphone et ne sont envoyées nulle part. Sauvegarde-les une fois par semaine. <span id="appVersion"></span></p>
 </section>
@@ -117,6 +118,7 @@
 <nav class="nav" aria-label="Navigation principale">
  <button class="active" data-screen="today"><span class="ico">☀️</span>Aujourd’hui</button><button data-screen="menus"><span class="ico">🍽️</span>Menus</button><button data-screen="weigh"><span class="ico">⚖️</span>Pesée</button><button data-screen="progress"><span class="ico">📈</span>Progrès</button><button data-screen="settings"><span class="ico">⚙️</span>Réglages</button>
 </nav><div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="./js/diag.js"></script>
 <script src="./js/config.js"></script>
 <script src="./js/cycle.js"></script>
 <script src="./js/util.js"></script>

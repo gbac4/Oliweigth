@@ -169,7 +169,6 @@ function renderCreator() {
   }
   const t = recipeTotals(draft);
   box.innerHTML = `<div class="card"><h2>Créer ma recette</h2><p class="small muted">Entre les quantités que tu mets d’habitude : la recette ne change pas, c’est la portion qui s’adapte. Tu ne connais pas une quantité ? Choisis une unité (paquet, boîte, c. à soupe…).</p>
-  <div class="row wrap"><button type="button" class="small-btn" data-tpl="kpwem">Partir du kpwem standard</button></div>
   <div class="field"><label for="crNom">Nom du plat</label><input id="crNom" data-cr="nom" value="${esc(draft.nom)}" maxlength="80" placeholder="Ex. Ndolé de maman"></div>
   <div class="row wrap"><div class="field grow"><label for="crMoment">Moment</label><select id="crMoment" data-cr="moment"><option value="R" ${draft.moment === 'R' ? 'selected' : ''}>Dîner ou souper</option><option value="P" ${draft.moment === 'P' ? 'selected' : ''}>Petit-déjeuner</option><option value="C" ${draft.moment === 'C' ? 'selected' : ''}>Collation</option></select></div>
   <div class="field grow"><label for="crSauce">Se mange avec un accompagnement</label><select id="crSauce" data-cr="sauce"><option value="1" ${draft.sauce ? 'selected' : ''}>Oui (sauce)</option><option value="0" ${!draft.sauce ? 'selected' : ''}>Non (plat complet)</option></select></div></div>
