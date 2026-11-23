@@ -41,7 +41,7 @@ def test_create_recipe_on_screen(page):
     page.click("#crNew")
     page.click("#crSave")
     assert "Il manque" in page.inner_text("#crErr")
-    page.click("[data-tpl=kpwem]")
+    page.evaluate("newDraft(STANDARD_RECIPES.kpwem)")  # le bouton de démonstration a été retiré (fiche #40)
     page.fill("#crNom", "Kpwem de test")
     page.dispatch_event("#crNom", "change")
     # la crème de palme en boîtes : 1 boîte = 400 g

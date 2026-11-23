@@ -109,10 +109,37 @@ function renderToday() {
           ...pinnedOptions(i),
         ].filter((c, j, a) => a.indexOf(c) === j && (j < 2 || c !== code));
         opts.forEach(ensureMeal);
+        const mine = customOptions(i),
+          isMine = isCustomCode(code),
+          mode = altMode(selectedDate, i),
+          scale = mealScale(selectedDate, i, code),
+          detail = isMine
+            ? customDetailsText(selectedDate, i, code)
+            : scaleText(m.details, scale, roundMode(selectedDate)),
+          red = num(l.rebal?.[i]);
         const [slotName, slotTime] = SLOTS[i].split(' · '),
           isNext = i === nextIdx,
           open = openMeals.has(i);
-        return `<article class="tl-item meal-card st-${v.status || 'todo'} ${isNext ? 'is-next' : ''}" data-meal="${i}"><div class="tl-time">${esc(slotTime || '')}</div><div class="tl-rail" aria-hidden="true"></div><div class="tl-card"><div class="tl-head"><button type="button" class="tl-check ${v.status === 'done' ? 'on' : ''}" data-quick="done" aria-pressed="${v.status === 'done'}" aria-label="${v.status === 'done' ? 'Annuler : ' : 'Marquer comme respecté : '}${esc(m.nom)}">${v.status === 'done' ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>' : ''}</button><button type="button" class="tl-open" data-open aria-expanded="${open}"><span class="tl-slot"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(slotName)} · ${fmtK(mealKcal(code, v, selectedDate, i))} kcal</span><span class="tl-tag">${esc(v.status ? STATUS_LABEL[v.status] : isNext ? 'Maintenant' : '')}</span></span><span class="tl-name">${esc(m.nom)}</span></button></div><div class="tl-body ${open ? '' : 'hidden'}">${photoBlock(m)}${pf !== 1 ? `<div class="small muted">Quantités ajustées pour ton budget du jour (≈ ${fmtK(dayGoal(selectedDate))} kcal).</div>` : ''}<div class="meal-detail">${esc(scaleText(m.details, pf, roundMode(selectedDate)))}</div>${pf !== 1 && scaleText(m.details, pf) !== m.details ? `<div class="small muted">Menu d’origine : ${esc(m.details)}</div>` : ''}${ingredientBlock(code, m, i, base[i])}${opts.length > 1 ? `<div class="field" style="margin-top:-4px"><label class="small muted">Changer pour un plat équivalent (calories proches)</label><select data-alt>${opts.map((c) => `<option value="${esc(c)}" ${c === code ? 'selected' : ''}>${c === base[i] ? 'Prévu : ' : ''}${esc(data.meals[c].nom)} · ≈ ${fmtK(kcalOf(c))} kcal</option>`).join('')}</select></div>` : ''}<div class="statuses">${[
+        return `<article class="tl-item meal-card st-${v.status || 'todo'} ${isNext ? 'is-next' : ''}" data-meal="${i}"><div class="tl-time">${esc(slotTime || '')}</div><div class="tl-rail" aria-hidden="true"></div><div class="tl-card"><div class="tl-head"><button type="button" class="tl-check ${v.status === 'done' ? 'on' : ''}" data-quick="done" aria-pressed="${v.status === 'done'}" aria-label="${v.status === 'done' ? 'Annuler : ' : 'Marquer comme respecté : '}${esc(m.nom)}">${v.status === 'done' ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>' : ''}</button><button type="button" class="tl-open" data-open aria-expanded="${open}"><span class="tl-slot"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(slotName)} · ${fmtK(mealKcal(code, v, selectedDate, i))} kcal</span><span class="tl-tag">${esc(v.status ? STATUS_LABEL[v.status] : isNext ? 'Maintenant' : '')}</span></span><span class="tl-name">${esc(m.nom)}</span></button></div><div class="tl-body ${open ? '' : 'hidden'}">${photoBlock(m)}${!isMine && scale !== 1 ? `<div class="small muted">Quantités ajustées pour ton budget du jour (≈ ${fmtK(dayGoal(selectedDate))} kcal)${red ? ` · −${fmtK(red)} kcal de rééquilibrage` : ''}.</div>` : ''}<div class="meal-detail">${esc(detail)}</div>${l.snackDeal?.[i] === 'skip' && red ? '<div class="small muted">Collation sautée pour rééquilibrer ta journée.</div>' : l.snackDeal?.[i] === 'half' && red ? '<div class="small muted">Collation réduite de moitié pour rééquilibrer ta journée.</div>' : ''}${isMine && mode !== 'fit' ? snackOfferHTML(selectedDate) + (uncompensated(selectedDate) ? `<div class="small muted">${fmtK(uncompensated(selectedDate))} kcal non compensés aujourd’hui : ce n’est pas grave une fois.</div>` : '') : ''}${!isMine && scale !== 1 && detail !== m.details ? `<div class="small muted">Menu d’origine : ${esc(m.details)}</div>` : ''}${ingredientBlock(code, m, i, base[i])}${
+          opts.length > 1 || mine.length
+            ? `<div class="field" style="margin-top:-4px"><label class="small muted">Changer de plat</label><select data-alt><optgroup label="Plats équivalents (calories proches)">${opts
+                .filter((c) => !isCustomCode(c))
+                .map(
+                  (c) =>
+                    `<option value="${esc(c)}" ${c === code ? 'selected' : ''}>${c === base[i] ? 'Prévu : ' : ''}${esc(data.meals[c].nom)} · ≈ ${fmtK(kcalOf(c))} kcal</option>`,
+                )
+                .join('')}</optgroup>${
+                mine.length
+                  ? `<optgroup label="Mes recettes">${mine
+                      .map(
+                        (r) =>
+                          `<option value="${esc(r.code)}|fit" ${isMine && r.code === code && mode === 'fit' ? 'selected' : ''}>🍲 ${esc(r.nom)} · portion ajustée (≈ ${fmtK(Math.round(plannedKcal(selectedDate, i) * pf))} kcal)</option>${PARTS_CHOICES.map((n) => `<option value="${esc(r.code)}|p${n}" ${isMine && r.code === code && mode === 'p' + n ? 'selected' : ''}>🍲 ${esc(r.nom)} · ${partsLabel(n)} (≈ ${fmtK(partsKcal(r.code, n))} kcal)</option>`).join('')}`,
+                      )
+                      .join('')}</optgroup>`
+                  : ''
+              }</select></div>`
+            : ''
+        }<div class="statuses">${[
           ['done', '✅ Fait'],
           ['partial', '🟡 Partiel'],
           ['replaced', '🔄 Remplacé'],
@@ -124,7 +151,7 @@ function renderToday() {
           )
           .join(
             '',
-          )}</div><div class="${v.status === 'partial' ? '' : 'hidden'}"><div class="small muted" style="margin-top:10px">Pourquoi partiel ?</div><div class="reason-list">${REASONS.map((r) => `<label><input type="checkbox" data-reason="${esc(r)}" ${(v.reasons || []).includes(r) ? 'checked' : ''}> ${esc(r)}</label>`).join('')}</div></div><div class="${v.status === 'replaced' ? '' : 'hidden'} field"><label>Par quoi as-tu remplacé ce repas ?</label><input data-replacement type="text" maxlength="160" value="${esc(v.replacement || '')}" placeholder="Ex. 2 beignets + bouillie"><label class="small muted" style="margin-top:6px">Calories estimées (facultatif)</label><input data-repl-kcal type="number" min="0" max="3000" step="10" inputmode="numeric" value="${v.kcal || ''}" placeholder="Ex. 450"></div><div class="adds">${ADDS.map(([lab, k], j) => `<button type="button" data-add="${j}">+ ${esc(lab.split(' +')[0])} <span class="muted">${k}</span></button>`).join('')}</div>${(v.adds || []).length ? `<div class="adds-info">Ajouts : ${esc(v.adds.map((a) => a.label).join(', '))} · +${fmtK(addsKcal(v))} kcal <button type="button" data-add-undo style="min-height:30px;padding:2px 8px;font-size:.75rem">Annuler le dernier</button></div>` : ''}</div></div></article>`;
+          )}</div><div class="${v.status === 'partial' ? '' : 'hidden'}"><div class="small muted" style="margin-top:10px">Pourquoi partiel ?</div><div class="reason-list">${REASONS.map((r) => `<label><input type="checkbox" data-reason="${esc(r)}" ${(v.reasons || []).includes(r) ? 'checked' : ''}> ${esc(r)}</label>`).join('')}</div></div><div class="${v.status === 'replaced' ? '' : 'hidden'} field"><label>Par quoi as-tu remplacé ce repas ?</label><input data-replacement type="text" maxlength="160" value="${esc(v.replacement || '')}" placeholder="Ex. 2 beignets + bouillie"><label class="small muted" style="margin-top:6px">Calories estimées (facultatif)</label><input data-repl-kcal type="number" min="0" max="3000" step="10" inputmode="numeric" value="${v.kcal || ''}" placeholder="Ex. 450"></div><div class="adds">${ADDS.map(([lab, k], j) => `<button type="button" data-add="${j}">+ ${esc(lab.split(' +')[0])} <span class="muted">${k}</span></button>`).join('')}</div>${(v.adds || []).length ? `<div class="adds-info">Ajouts · +${fmtK(addsKcal(v))} kcal <span class="muted">(touche un ajout pour le retirer)</span><div class="adds-list">${v.adds.map((a, j) => `<button type="button" data-add-del="${j}" aria-label="Retirer ${esc(a.label)}">${esc(a.label.split(' +')[0])} <span class="muted">${a.kcal}</span> ✕</button>`).join('')}</div></div>` : ''}</div></div></article>`;
       })
       .join('') +
     `<article class="tl-item is-stop"><div class="tl-time">${esc(s.cutoffTime || '21:00').replace(':00', ' h')}</div><div class="tl-rail" aria-hidden="true"></div><div class="tl-card tl-stop"><b>Cuisine fermée</b><div class="small muted">Eau ou tisane sans sucre.</div></div></article>`;

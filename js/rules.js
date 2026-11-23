@@ -76,6 +76,8 @@ function ruleBanners() {
 function applyRulesToUI() {
   const card = $('feedsCard');
   if (card) card.classList.toggle('hidden', !isBreastfeeding());
+  const fb = $('footBf');
+  if (fb) fb.classList.toggle('hidden', !isBreastfeeding());
   const lab = document.querySelector('label[for="targetLoss"]');
   if (lab)
     lab.textContent =
