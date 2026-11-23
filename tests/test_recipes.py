@@ -62,3 +62,14 @@ def test_existing_user_menus_untouched(page):
     d = state(page)
     assert d["meta"].get("menusFrom") is None
     assert d["plan"]["1"][4] == "S-A"
+
+
+def test_tags_do_not_confuse_words(page):
+    # « bœuf » n'est pas un œuf, « laitue » n'est pas du lait (fiche #40)
+    t = page.evaluate("""(() => {
+      const tagOf = (nom, ing) => recipeMeta('RX', {nom, details: '', ing, kcal: 400}).tags;
+      return [tagOf('Ragoût de bœuf', ['P:Bœuf maigre']), tagOf('Salade verte', ['L:Laitue']),
+              tagOf('Omelette', ['O:Œufs']), tagOf('Lait chaud', ['O:Lait 1 %'])];
+    })()""")
+    assert "oeuf" not in t[0] and "lait" not in t[1]
+    assert "oeuf" in t[2] and "lait" in t[3]

@@ -16,8 +16,8 @@ const TAGS = {
   arachide: [/arachide/, 'Arachide'],
   poisson: [/sardine|maquereau|tilapia|saumon|truite|thon|poisson/, 'Poisson'],
   crustaces: [/crevette/, 'Crustacés'],
-  lait: [/lait(?! de coco)|yaourt|fromage|feta|whey/, 'Produits laitiers'],
-  oeuf: [/oeuf/, 'Œuf'],
+  lait: [/\blait\b(?! de coco)|yaourt|fromage|feta|whey/, 'Produits laitiers'],
+  oeuf: [/\boeufs?\b|omelette/, 'Œuf'],
   porc: [/jambon|porc/, 'Porc'],
   noix: [/amande|noix/, 'Noix'],
   sel: [/crevettes sechees|bouillon|jambon|feta/, 'Riche en sel'],
@@ -31,7 +31,7 @@ const ALLERGY_WORDS = [
   [/gluten|ble/, 'gluten'],
   [/poisson/, 'poisson'],
   [/crevette|fruits de mer|crustace/, 'crustaces'],
-  [/oeuf/, 'oeuf'],
+  [/\boeufs?\b|omelette/, 'oeuf'],
   [/noix|amande/, 'noix'],
   [/porc|jambon/, 'porc'],
 ];
@@ -147,7 +147,7 @@ const PROTEIN_OF = [
   [/poulet|dindon/, 'volaille'],
   [/boeuf|porc|jambon|viande/, 'viande'],
   [/sardine|maquereau|tilapia|saumon|truite|thon|poisson|crevette|ecrevisse|hareng/, 'mer'],
-  [/oeuf|omelette/, 'oeuf'],
+  [/\boeufs?\b|omelette/, 'oeuf'],
   [/haricot|lentille|pois chiche|pois|tofu/, 'legumineuse'],
 ];
 function proteinOf(r) {
