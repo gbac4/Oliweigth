@@ -14,6 +14,8 @@ jobs:
         with: { node-version: "22" }
       - name: Syntaxe JS
         run: for f in js/*.js sw.js; do node --check "$f"; done
+      - name: Aucun fichier d'outillage dans le repo
+        run: test -z "$(git ls-files tools/node_modules)" || (echo "tools/node_modules ne doit pas être versionné" && exit 1)
       - name: Contrôle du code (ESLint)
         run: cd tools && npm ci --no-audit --no-fund && npm run lint
       - name: Formatage (prettier)
