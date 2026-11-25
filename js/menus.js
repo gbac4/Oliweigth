@@ -213,6 +213,8 @@ function renderMenus() {
   $('menuLabel').textContent = (w ? w.label : data.current?.label || data.settings.menuLabel) || '';
   $('weekInfo').textContent =
     `Du ${fmtDate(st, {weekday: 'long', day: 'numeric', month: 'long'})} au ${fmtDate(weekEnd(st), {weekday: 'long', day: 'numeric', month: 'long'})}.${w ? ' Ces menus remplaceront automatiquement ceux de la semaine en cours le lundi.' : ''} Tu peux modifier un repas ou échanger des jours.`;
+  $('weekFamilies').innerHTML = weekFamiliesHTML(plan, vMeal);
+  if (!$('semaineBox').closest('details').open) renderSemaine();
   const today = String(dayIndex(todayISO()));
   $('menuDays').innerHTML = Array.from({length: 7}, (_, i) => {
     const day = String(i + 1),

@@ -180,6 +180,23 @@ main {
   padding: 4px 9px;
   color: var(--muted);
 }
+.pill.warn {
+  background: color-mix(in srgb, var(--warn, #e0a030) 22%, transparent);
+  color: var(--text);
+}
+.sem-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.sem-table th,
+.sem-table td {
+  text-align: left;
+  padding: 4px 6px 4px 0;
+}
+.sem-table select {
+  min-height: 36px;
+}
 .pill.ok {
   background: var(--brand2);
   color: var(--brand);
