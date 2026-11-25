@@ -2,7 +2,7 @@
 // Change VERSION à chaque mise en ligne : les téléphones récupèrent alors la nouvelle version.
 // Seulement nos propres caches : une autre app du même domaine (la bêta) garde les siens.
 const CACHE_PREFIX = 'oliweight-v';
-const VERSION = 'oliweight-v3.7.2';
+const VERSION = 'oliweight-v3.8.0';
 const CORE = [
   './',
   './index.html',
@@ -23,6 +23,7 @@ const CORE = [
   './js/menus.js',
   './js/foods.js',
   './js/recipes.js',
+  './js/semaine.js',
   './js/creator.js',
   './js/pantry.js',
   './js/today.js',

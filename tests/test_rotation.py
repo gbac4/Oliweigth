@@ -20,6 +20,8 @@ def test_bank_is_larger(page):
 
 
 def test_mains_do_not_repeat_within_window(page):
+    # sans règles « Ma semaine type » : aucune répétition sur 3 semaines (les quotas sont testés dans test_semaine.py)
+    page.evaluate("(data.profile = data.profile || {}).semaine = Object.fromEntries(FAMILIES.map(([k]) => [k, {min: 0, max: null}]))")
     w = gen(page)
     mains = [set(d[2] for d in days([x])) | set(d[4] for d in days([x])) for x in w]
     for i in range(len(mains) - 2):

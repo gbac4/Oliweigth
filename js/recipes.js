@@ -162,11 +162,16 @@ function makePicker(list, lastUsed, p, refDate) {
   const used = {...lastUsed},
     windowStart = shiftDate(refDate, -7 * rotationWeeks()),
     score = new Map(list.map((r) => [r.code, scoreRecipe(r, p)]));
-  return function pick(date, avoid = new Set(), avoidProtein = null) {
+  // pre(r) : quotas de « Ma semaine type » [maximum, minimum], après « déjà dans la semaine » et avant l'historique :
+  // une demande explicite de la personne passe avant la variété calculée par l'app
+  return function pick(date, avoid = new Set(), avoidProtein = null, pre = null) {
     const key = (r) => {
-      const d = used[r.code] || '0000-00-00';
+      const d = used[r.code] || '0000-00-00',
+        q = pre ? pre(r) : [0, 0];
       return [
         avoid.has(r.code) ? 1 : 0,
+        q[0],
+        q[1],
         d >= windowStart ? 1 : 0,
         avoidProtein && proteinOf(r) === avoidProtein ? 1 : 0,
         d,
@@ -217,7 +222,9 @@ function generateCycle(p, startMonday, nWeeks = 5, lastUsed = {}) {
     pickP = makePicker(Pl, lastUsed, p, startMonday),
     pickC = makePicker(Cl, lastUsed, p, startMonday),
     pickR = makePicker(Rl, lastUsed, p, startMonday);
-  const weeks = [];
+  const weeks = [],
+    rules = semaineRules(),
+    famLast = familyLastDates(lastUsed, Rl);
   let lastProtein = null;
   for (let w = 0; w < nWeeks; w++) {
     const ws = shiftDate(startMonday, w * 7),
@@ -225,13 +232,19 @@ function generateCycle(p, startMonday, nWeeks = 5, lastUsed = {}) {
       day = (i) => (twoDays ? [0, 0, 1, 1, 2, 2, 3][i] : i),
       lunch = [],
       dinner = [],
-      inWeek = new Set();
-    // plats principaux : distincts dans la semaine, alternance des protéines (dîner puis souper de chaque bloc)
+      inWeek = new Set(),
+      quota = makeWeekQuota(rules, famLast),
+      weight = (k) => (twoDays ? [2, 2, 2, 1][k] : 1);
+    let wRem = MAIN_MEALS;
+    // plats principaux : distincts dans la semaine, quotas de « Ma semaine type », alternance des protéines
     for (let k = 0; k < nMain; k++) {
-      const date = shiftDate(ws, twoDays ? [0, 2, 4, 6][k] : k);
+      const date = shiftDate(ws, twoDays ? [0, 2, 4, 6][k] : k),
+        wk = weight(k);
       for (const out of [lunch, dinner]) {
-        const r = pickR(date, inWeek, lastProtein);
+        const r = pickR(date, inWeek, lastProtein, (x) => quota.key(x, wk, wRem, date));
         inWeek.add(r.code);
+        quota.add(r, wk, date);
+        wRem -= wk;
         lastProtein = proteinOf(r);
         out.push(r);
       }

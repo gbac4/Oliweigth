@@ -49,6 +49,15 @@ Toute modification d'une valeur ci-dessous passe par une PR qui met ce fichier �
 | Protéines (prévu) | 1,3 g/kg en allaitement | ✅ | ANREF (Institute of Medicine) | à venir |
 | Protéines hors allaitement (prévu) | 1,0 à 1,2 g/kg | ⚠️ | Au-dessus de l'ANREF (0,8 g/kg), choix pour une période de perte de poids | à venir |
 
+## 4 bis. Ma semaine type (valeurs conseillées, modifiables par la personne)
+
+| Règle | Valeur | Statut | Source | Code |
+|---|---|---|---|---|
+| Poisson | 2 à 3 repas/semaine | ✅ | Santé Canada : au moins 2 portions de poisson par semaine ; en grossesse et allaitement, choisir des poissons pauvres en mercure | `semaine.js` `SEMAINE_DEFAUT` |
+| Légumineuses | au moins 2 repas/semaine | ⚠️ | Dans l'esprit du Guide alimentaire canadien (protéines végétales plus souvent) ; nombre choisi par nous | `semaine.js` |
+| Viande rouge (bœuf 2, porc 1 au plus) | 3 repas/semaine au plus | ⚠️ | Repères de santé publique qui conseillent de limiter la viande rouge ; seuil choisi par nous | `semaine.js` |
+| Volaille, fruits de mer, œuf | 4, 2, 2 au plus | ⚠️ | Variété (retour des testeurs) | `semaine.js` |
+
 ## 5. Valeurs des aliments
 
 | Règle | Statut | Source | Code |
