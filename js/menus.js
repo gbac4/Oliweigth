@@ -16,6 +16,23 @@ function weekEnd(start) {
 function swapPlan(plan, sw) {
   const p = clone(plan),
     g = (k) => p[String(k)] || [];
+  // fiche #47 : changer un plat ('repl') ou échanger un repas entre deux jours ('slot')
+  if (sw.mode === 'repl') {
+    const d = g(sw.day).slice();
+    if (d.length) d[sw.slot] = sw.code;
+    p[sw.day] = d;
+    return p;
+  }
+  if (sw.mode === 'slot') {
+    const a = g(sw.a).slice(),
+      b = g(sw.b).slice(),
+      t = a[sw.slot];
+    a[sw.slot] = b[sw.slot];
+    b[sw.slot] = t;
+    p[sw.a] = a;
+    p[sw.b] = b;
+    return p;
+  }
   if (sw.mode === 'bloc') {
     const A = BLOCS[sw.a],
       B = BLOCS[sw.b];
@@ -212,7 +229,7 @@ function renderMenus() {
     st = vStart();
   $('menuLabel').textContent = (w ? w.label : data.current?.label || data.settings.menuLabel) || '';
   $('weekInfo').textContent =
-    `Du ${fmtDate(st, {weekday: 'long', day: 'numeric', month: 'long'})} au ${fmtDate(weekEnd(st), {weekday: 'long', day: 'numeric', month: 'long'})}.${w ? ' Ces menus remplaceront automatiquement ceux de la semaine en cours le lundi.' : ''} Tu peux modifier un repas ou échanger des jours.`;
+    `Du ${fmtDate(st, {weekday: 'long', day: 'numeric', month: 'long'})} au ${fmtDate(weekEnd(st), {weekday: 'long', day: 'numeric', month: 'long'})}.${w ? ' Ces menus remplaceront automatiquement ceux de la semaine en cours le lundi.' : ''} Tu peux changer un plat des jours à venir ou échanger des jours.`;
   $('weekFamilies').innerHTML = weekFamiliesHTML(plan, vMeal);
   if (!$('semaineBox').closest('details').open) renderSemaine();
   const today = String(dayIndex(todayISO()));
@@ -224,7 +241,7 @@ function renderMenus() {
         const code = arr[j] || '';
         const m = vMeal(code);
         const others = usedOn(code).filter((d) => d !== DAYS[day]);
-        return `<div class="meal-edit"><div class="small muted">${esc(slot)} · ${esc(code)} · ≈ ${fmtK(kcalOf(code, m))} kcal${others.length ? ' · aussi ' + esc(others.join(', ')) : ''}</div>${photoBlock(m)}<div class="field"><label>Nom du repas</label><input data-menu-name="${day}-${j}" value="${esc(m.nom)}" maxlength="100"></div><div class="field"><label>Détails et portions</label><textarea data-menu-details="${day}-${j}" maxlength="900">${esc(m.details)}</textarea></div></div>`;
+        return `<div class="meal-edit"><div class="small muted">${esc(slot)} · ${esc(code)} · ≈ ${fmtK(kcalOf(code, m))} kcal${others.length ? ' · aussi ' + esc(others.join(', ')) : ''}</div>${photoBlock(m)}${replSelectHTML(vStart(), day, j, code)}<details class="small"><summary class="muted">Modifier le texte (les calories ne changent pas)</summary><div class="field"><label>Nom du repas</label><input data-menu-name="${day}-${j}" value="${esc(m.nom)}" maxlength="100"></div><div class="field"><label>Détails et portions</label><textarea data-menu-details="${day}-${j}" maxlength="900">${esc(m.details)}</textarea></div></details></div>`;
       },
     ).join('')}</div></details>`;
   }).join('');

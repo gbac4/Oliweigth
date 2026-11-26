@@ -2,6 +2,12 @@
 
 Format : une entrée par version publiée sur GitHub Pages. La version s'affiche dans Réglages, tout en bas.
 
+## 3.9.0 — 2026-11-26 (changer les menus de la semaine)
+- Menus : « Changer de plat » sur chaque repas des jours à venir (semaine en cours et suivantes) : plats équivalents ou « Mes recettes ». Les calories, l'écran Aujourd'hui et la liste de courses suivent. Avec la cuisine pour 2 jours, le jour voisin qui a le même plat change aussi. Demande d'un testeur.
+- Aujourd'hui : « Pas aujourd'hui ? Échanger avec un autre jour » : le repas est échangé avec celui d'un jour suivant de la semaine (pas pour un « je n'aime pas », pour un « pas envie aujourd'hui »).
+- La modification libre du texte d'un repas reste possible, repliée, avec l'avertissement « les calories ne changent pas ».
+- « Annuler les échanges » retire aussi les changements de plat. Jours passés et repas déjà notés : verrouillés.
+
 ## 3.8.0 — 2026-11-25 (Ma semaine type)
 - Menus › « 🍽️ Ma semaine type » : pour chaque famille (volaille, bœuf, porc, poisson, fruits de mer, légumineuses, œuf), un minimum et un maximum de dîners et soupers par semaine, ou « ≈ 1 fois par mois ». Valeurs conseillées : poisson 2 à 3, volaille 4 au plus, bœuf 2 au plus, porc 1 au plus, fruits de mer 2 au plus, œuf 2 au plus, légumineuses au moins 2. Demande des 4 testeurs (trop de poisson, de sardines et de poulet).
 - Le générateur de menus respecte ces règles (menus créés depuis la banque) ; enregistrer refait les menus à partir de lundi prochain. Un cycle publié n'est pas modifié.
