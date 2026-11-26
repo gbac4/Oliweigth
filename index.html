@@ -43,12 +43,13 @@
  <div class="seg"><button class="active" data-menutab="week">🗓️ Menus</button><button data-menutab="shop">🛒 Courses</button><button data-menutab="recipes">📚 Recettes</button></div>
  <div class="chips" id="weekChips"></div>
  <div id="menuWeek">
-  <div class="card"><p class="small muted" style="margin:0" id="weekInfo"></p></div>
+  <div class="card"><p class="small muted" style="margin:0" id="weekInfo"></p><div id="weekFamilies"></div></div>
   <div class="day-list" id="menuDays"></div>
   <div class="card"><h2>Échanger des jours</h2><p class="small muted">Les soupers et les dîners sont cuisinés pour 2 jours (lun-mar, mer-jeu, ven-sam) : « bloc de 2 jours » garde cette organisation.</p>
    <div class="field"><label for="swapMode">Quoi échanger</label><select id="swapMode"><option value="bloc">Bloc de 2 jours</option><option value="day">Jour entier</option><option value="souper">Souper seulement</option><option value="diner">Dîner seulement</option></select></div>
    <div class="row"><div class="field grow"><label for="swapA">Entre</label><select id="swapA"></select></div><div class="field grow"><label for="swapB">et</label><select id="swapB"></select></div></div>
    <div class="row wrap"><button class="primary grow" id="swapDo">Échanger</button><button id="swapUndo">Annuler les échanges</button></div></div>
+  <details class="card"><summary><b>🍽️ Ma semaine type</b> <span class="small muted">poisson, volaille, légumineuses…</span></summary><div id="semaineBox"></div></details>
  </div>
  <div id="menuRecipes" class="hidden"><div class="card"><div class="row between"><h2 style="margin:0">Banque de recettes</h2><span class="pill" id="recipeCount"></span></div><p class="small muted">Toutes les recettes d’OliWeight. Les étiquettes sont indicatives : en cas d’allergie ou de maladie, vérifie toujours les ingrédients.</p><div id="recipeFilters"></div></div><div class="day-list" id="recipeList"></div></div>
  <div id="menuShop" class="hidden">
@@ -131,6 +132,8 @@
 <script src="./js/menus.js"></script>
 <script src="./js/foods.js"></script>
 <script src="./js/recipes.js"></script>
+<script src="./js/semaine.js"></script>
+<script src="./js/planedit.js"></script>
 <script src="./js/creator.js"></script>
 <script src="./js/pantry.js"></script>
 <script src="./js/today.js"></script>

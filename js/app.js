@@ -295,7 +295,7 @@ $('swapDo').addEventListener('click', () => {
 });
 $('swapUndo').addEventListener('click', () => {
   const w = viewObj() || data.current;
-  if (!confirm('Annuler tous les échanges de cette semaine ?')) return;
+  if (!confirm('Annuler tous les échanges et changements de plat de cette semaine ?')) return;
   w.swaps = [];
   if (!viewObj()) data.plan = effPlan(data.current);
   save();

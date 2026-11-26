@@ -139,7 +139,7 @@ function renderToday() {
                   : ''
               }</select></div>`
             : ''
-        }<div class="statuses">${[
+        }${v.status ? '' : laterHTML(selectedDate, i)}<div class="statuses">${[
           ['done', '✅ Fait'],
           ['partial', '🟡 Partiel'],
           ['replaced', '🔄 Remplacé'],
